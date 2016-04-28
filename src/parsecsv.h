@@ -21,6 +21,7 @@
 #define PARSECSV_H
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>

@@ -126,7 +126,7 @@ public slots:
         return QString(institution[pos].c_str());
     }
     void display();
-    QString covertToJSON();
+    QString covertToJSON(int runCount);
 
 };
 #endif // FILEOBJ_H

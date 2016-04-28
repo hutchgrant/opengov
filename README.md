@@ -53,4 +53,4 @@ see [Contributing](https://github.com/hutchgrant/opengov/blob/master/CONTRIBUTIN
 **Grant Hutchinson**
 
 ## License
-All code and documentation from 2011- 2015 is available under the terms of the [GNU Public License v3](http://www.gnu.org/copyleft/gpl.html)
+All code and documentation from 2016 is available under the terms of the [GNU Public License v3](http://www.gnu.org/copyleft/gpl.html)

@@ -24,7 +24,7 @@
  */
 parseCSV::parseCSV()
 {
-    filename = "dataJSON.txt";
+    filename = "data.json";
     init(0, "");
 }
 
@@ -60,7 +60,7 @@ bool parseCSV::readFile(QString input){
     entry.school = query;
     entry.provTotal = total;
 
-    if(writeFile(entry.covertToJSON())){
+    if(writeFile(entry.covertToJSON(runCount))){
         return true;
     }
 }
@@ -70,12 +70,20 @@ bool parseCSV::readFile(QString input){
  */
 bool parseCSV::writeFile(QString data){
     QFile file(filename);
-    if (file.open(QIODevice::ReadWrite | QIODevice::Append)) {
-        QTextStream stream(&file);
-        if(runCount == 0){
+    if(file.exists() && runCount == 0){
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
+            QTextStream stream(&file);
             data.insert(0, '[');
-         }
             stream << data << endl;
+        }
+    }else{
+        if (file.open(QIODevice::ReadWrite | QIODevice::Append)) {
+            QTextStream stream(&file);
+            if(runCount == 0){
+                data.insert(0, '[');
+             }
+                stream << data << endl;
+        }
     }
     return true;
 }
@@ -89,6 +97,8 @@ bool parseCSV::endJSON(){
         QTextStream stream(&file);
         stream << "]" << endl;
     }
+    QTextStream sout(stdout);
+    sout << "JSON File exported to: " << QDir::currentPath() << "/data.json" << endl;
     return true;
 }
 
@@ -103,11 +113,11 @@ void parseCSV::parse(QString line){
     if(line.section(',', 0, 0).indexOf("\"") == 0){
         // if quote found at start of line, strange but some lines do
         // their is an exception within some ministry titles, where some columns contain a comma, accompanied by a quote,
-        institution = line.section(',', 0, 0).toStdString();
+        institution = line.section(',', 0, 0).replace(QString("\""),QString("")).toStdString();
         reason = line.section(',', 3, 3).toStdString();
         amt = line.section(',', 12, 15).toStdString();
 
-        /// format for integer conversion, add for total, remove quotes and $
+        // format for integer conversion, add for total, remove quotes and $
         amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
         total += amtClean.toInt();
     }else{
@@ -115,7 +125,7 @@ void parseCSV::parse(QString line){
         reason = line.section(',', 2, 2).toStdString();
         amt = line.section(',', 11, 15).toStdString();
 
-        /// format for integer conversion, add for total
+        // format for integer conversion, add for total
         amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
         total += amtClean.toInt();
     }

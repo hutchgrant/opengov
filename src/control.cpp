@@ -42,6 +42,7 @@ bool control::manageInstall(){
     sout << "Install 2014-2015 data? <y/n>" << endl;
     qInstall = sin.readLine();
     if(qInstall == "y"){
+       sout << "downloading..." << endl;
        process.start("wget "+ csv);
        process.waitForFinished();
        sout << "data installed" << endl;

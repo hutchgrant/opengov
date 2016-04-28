@@ -129,8 +129,8 @@ void fileObj::display(){
 /*
  * Display JSON
  */
-QString fileObj::covertToJSON(){
-    QString qSchool = "", qTotal = "", totalForm = "", amtWcomma = "";
+QString fileObj::covertToJSON(int runCount){
+    QString qSchool = "", qTotal = "", totalForm = "", amtWcomma = "", qOpen="";
     string jAmt = "", jInstitution = "", jReason = "";
     std::stringstream stream;
 
@@ -142,24 +142,32 @@ QString fileObj::covertToJSON(){
     qTotal = "\"provTotal\":\""+ totalForm+"\", ";
 
     // format school
-    qSchool = "\"school\":\""+QString(school.c_str())+"\", ";
-
-    stream << "{" << qSchool.toStdString().c_str() <<  qTotal.toStdString().c_str()<< endl;
+    qSchool = "\"title\":\""+QString(school.c_str())+"\", ";
+    if(runCount == 0){
+        qOpen = "{";
+    }else{
+        qOpen = ",{";
+    }
+    stream << qOpen.toStdString().c_str() << qSchool.toStdString().c_str() <<  qTotal.toStdString().c_str()<< endl;
 
     stream <<  "\"funding\":["<< endl;
     // format funding data
     for(int i=0; i< objSize; i++){
 
-        jInstitution = "\"institution\":\""+QString(getInst(i)).toStdString()+"\", ";
+        jInstitution = "{\"ministry\":\""+QString(getInst(i)).toStdString()+"\", ";
         jReason = "\"reason\":\""+QString(getReason(i)).toStdString()+"\", ";
 
         // remove $, leave commas
         amtWcomma = QString(getAmt(i)).replace(QString("$"), QString(""));
-        jAmt = "\"amt\":"+amtWcomma.toStdString();
 
+        if(i == objSize-1){
+            jAmt = "\"amt\":"+amtWcomma.toStdString()+"}";
+        }else{
+            jAmt = "\"amt\":"+amtWcomma.toStdString()+"},";
+        }
         stream << jInstitution.c_str() << jReason.c_str() << jAmt.c_str()<< endl;
     }
-    stream << "]}," << endl;
+    stream << "]}" << endl;
     return QString(stream.str().c_str());
 }
 
