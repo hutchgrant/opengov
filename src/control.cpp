@@ -56,14 +56,12 @@ bool control::manageInstall(){
  *  Grep all data for lines containing query
  *  export to file, parse file
  */
-bool control::manageQueries(){
+bool control::manageQueries(string outputPath){
 
     QTextStream sin(stdin);
     QTextStream sout(stdout);
     QString qSearch = "", qFind = "";
     QProcess process;
-    bool retval= false;
-    QByteArray buffer;
 
     sout << "Enter a string to search:" << endl;
     qSearch = sin.readLine();
@@ -72,11 +70,10 @@ bool control::manageQueries(){
     qFind = "bash -c \"grep -i '"+qSearch+"' pa_volume_3_0.csv " +"> verbose.txt\"";
     process.start(qFind);
     process.waitForFinished();
-    sout << "data installed" << endl;
+    sout << "data extracted from budget" << endl;
     process.close();
-
-    if(parse.readFile("verbose.txt")){
-        qDebug() << "done" << endl;
+    if(parse.readFile("verbose.txt",QString(outputPath.c_str()))){
+        sout << "data successfully exported to JSON" << endl;
     }
     runCount++;
 }

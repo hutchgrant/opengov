@@ -37,7 +37,7 @@ public:
 
     control();
     bool manageInstall();
-    bool manageQueries();
+    bool manageQueries(string filepath);
     bool manageLoop();
 };
 

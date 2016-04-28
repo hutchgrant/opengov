@@ -24,7 +24,7 @@
  */
 parseCSV::parseCSV()
 {
-    filename = "data.json";
+    filename = "";
     init(0, "");
 }
 
@@ -44,7 +44,8 @@ void parseCSV::init(int rCount, string qry){
 /*
  * read text file for grep'd data, send to parser
  */
-bool parseCSV::readFile(QString input){
+bool parseCSV::readFile(QString input, QString output){
+    filename = output;
 
     QFile inputFile(input);
     if (inputFile.open(QIODevice::ReadOnly))

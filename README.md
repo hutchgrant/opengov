@@ -44,12 +44,17 @@ make
 ```
 ./opengov
 ```
+JSON will automatically export to the applications path in a file called data.json
+You can export JSON to a specific path by adding your path as an argument
+```
+./opengov /var/www/mysite/data.json
+```
 
 ##Contributing
 
 see [Contributing](https://github.com/hutchgrant/opengov/blob/master/CONTRIBUTING.md)
 
-## Creators
+## Creator
 **Grant Hutchinson**
 
 ## License

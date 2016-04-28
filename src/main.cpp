@@ -26,8 +26,11 @@ int main(int argc, char *argv[])
     control cntrl;
     bool exit = false;
     if(cntrl.manageInstall()){
+        if(!argv[1]){
+            argv[1] = "data.json";
+        }
         while(exit == false){
-            if(cntrl.manageQueries()){
+            if(cntrl.manageQueries(argv[1])){
                 exit = cntrl.manageLoop();
             }
         }

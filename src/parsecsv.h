@@ -41,7 +41,7 @@ public:
 
     parseCSV();
     void init(int rCount, string qry);
-    bool readFile(QString input);
+    bool readFile(QString input, QString output);
     bool writeFile(QString stream);
     bool endJSON();
     void parse(QString line);
