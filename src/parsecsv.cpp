@@ -99,7 +99,11 @@ bool parseCSV::endJSON(){
         stream << "]" << endl;
     }
     QTextStream sout(stdout);
-    sout << "JSON File exported to: " << QDir::currentPath() << "/data.json" << endl;
+    if(filename == "data.json"){
+        sout << "JSON File exported to: " << QDir::currentPath() << "/data.json" << endl;
+    }else{
+        sout << "JSON File exported to: " << filename << endl;
+    }
     return true;
 }
 
