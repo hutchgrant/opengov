@@ -116,23 +116,51 @@ void parseCSV::parse(QString line){
     QString amtClean = "";
     string amt = "", reason = "", institution = "";
     if(line.section(',', 0, 0).indexOf("\"") == 0){
-        // if quote found at start of line, strange but some lines do
+        // if quote found at start of line
         // their is an exception within some ministry titles, where some columns contain a comma, accompanied by a quote,
         institution = line.section(',', 0, 0).replace(QString("\""),QString("")).toStdString();
-        reason = line.section(',', 3, 3).toStdString();
-        amt = line.section(',', 12, 15).toStdString();
-
+        if(line.section(',', 2, 2).indexOf("\"") == 0){
+            // if quotes found in the second column, skip to 4th comma(3rd column); same exception
+            if(line.section(',', 4, 4).indexOf("\"") == 0){
+                // if quotes found in the fourth column, skip to 6th comma(seventh column); same exception
+                reason = line.section(',', 4, 5).toStdString();
+                amt = line.section(',', 14, 15).toStdString();
+            }else{
+                reason = line.section(',', 4, 4).toStdString();
+                amt = line.section(',', 13, 15).toStdString();
+            }
+        }else{
+            reason = line.section(',', 3, 3).toStdString();
+            amt = line.section(',', 12, 15).toStdString();
+        }
         // format for integer conversion, add for total, remove quotes and $
         amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
-        total += amtClean.toInt();
+        total += amtClean.toLong();
     }else{
         institution = line.section(',', 0, 0).toStdString();
-        reason = line.section(',', 2, 2).toStdString();
-        amt = line.section(',', 11, 15).toStdString();
-
+            if(line.section(',', 2, 2).indexOf("\"") == 0){
+                // if quotes found in the second column, skip to 4th comma(3rd column); same exception
+                if(line.section(',', 4, 4).indexOf("\"") == 0){
+                    // if quotes found in the fifth column; same exception // have yet to find this exception may cause error
+                    reason = line.section(',', 4, 5).toStdString();
+                    amt = line.section(',', 13, 16).toStdString();
+                }else{
+                    reason = line.section(',', 4, 4).toStdString();
+                    amt = line.section(',', 13, 15).toStdString();
+                }
+            }else{
+                if(line.section(',', 4, 4).indexOf("\"") == 0){
+                    // if quotes found in the fifth column; same exception
+                    reason = line.section(',', 2, 2).toStdString();
+                    amt = line.section(',', 13, 16).toStdString();
+                }else{
+                    reason = line.section(',', 2, 2).toStdString();
+                    amt = line.section(',', 11, 15).toStdString();
+                }
+            }
         // format for integer conversion, add for total
         amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
-        total += amtClean.toInt();
+        total += amtClean.toLong();
     }
     entry.set(counter, institution.c_str(), amt.c_str(), reason.c_str());
     counter++;

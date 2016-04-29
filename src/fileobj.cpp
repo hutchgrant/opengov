@@ -138,7 +138,9 @@ QString fileObj::covertToJSON(int runCount){
     qTotal= QString::number(provTotal);
     totalForm = qTotal.insert(qTotal.length()-3, ",");
     totalForm = totalForm.insert(qTotal.length()-7, ",");
-    totalForm = totalForm.insert(qTotal.length()-11, ",");
+    if(qTotal.length() > 10){
+        totalForm = totalForm.insert(qTotal.length()-10, ",");
+    }
     qTotal = "\"provTotal\":\""+ totalForm+"\", ";
 
     // format school

@@ -44,11 +44,14 @@ make
 ```
 ./opengov
 ```
-JSON will automatically export to the applications path in a file called data.json
+JSON will export by default to the application's path, in a file called "data.json"
+
 You can export JSON to a specific path by adding your path as an argument
 ```
 ./opengov /var/www/mysite/data.json
 ```
+
+You can review the verbose extracted data, in a file called "verbose.txt", within the application's path
 
 ##Contributing
 

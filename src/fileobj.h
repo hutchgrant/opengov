@@ -41,7 +41,7 @@ public:
     string *reason;         // reason for funding
     int objSize;            // Number of Items
     int InitSize;           // Number size before reallocate
-    int provTotal;
+    long provTotal;
 
     explicit fileObj();
     fileObj(const fileObj& src);

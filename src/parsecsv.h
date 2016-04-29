@@ -34,7 +34,7 @@ class parseCSV
 public:
     int counter;
     int runCount;
-    int total;
+    long total;
     QString qTotal;
     string query;
     QString filename;
