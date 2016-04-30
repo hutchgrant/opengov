@@ -22,9 +22,8 @@
 
 #include <QDebug>
 #include <QTextStream>
-#include <QProcess>
 #include <cstring>
-#include <src/parsecsv.h>
+#include <parsecsv.h>
 
 using namespace std;
 class control
@@ -33,7 +32,6 @@ public:
     parseCSV parse;
     string *query;
     int runCount;
-    QString csv;
 
     control();
     bool manageInstall();

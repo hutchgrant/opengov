@@ -25,7 +25,6 @@
 control::control()
 {
     runCount = 0;
-    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
 }
 
 /*
@@ -35,18 +34,14 @@ bool control::manageInstall(){
     QTextStream sin(stdin);
     QTextStream sout(stdout);
     QString qInstall = "";
-    QProcess process;
-    bool retval = false;
-    QByteArray buffer;
 
     sout << "Install 2014-2015 data? <y/n>" << endl;
     qInstall = sin.readLine();
     if(qInstall == "y"){
        sout << "downloading..." << endl;
-       process.start("wget "+ csv);
-       process.waitForFinished();
-       sout << "data installed" << endl;
-       process.close();
+       if(parse.download()){
+        sout << "data installed" << endl;
+       }
      }
      return true;
 }
@@ -60,22 +55,19 @@ bool control::manageQueries(string outputPath){
 
     QTextStream sin(stdin);
     QTextStream sout(stdout);
-    QString qSearch = "", qFind = "";
-    QProcess process;
+    QString qSearch = "";
 
     sout << "Enter a string to search:" << endl;
     qSearch = sin.readLine();
-    parse.init(runCount, qSearch.toStdString());
 
-    qFind = "bash -c \"grep -i '"+qSearch+"' pa_volume_3_0.csv " +"> verbose.txt\"";
-    process.start(qFind);
-    process.waitForFinished();
-    sout << "data extracted from budget" << endl;
-    process.close();
-    if(parse.readFile("verbose.txt",QString(outputPath.c_str()))){
+    if(parse.query(runCount, qSearch)){
+        sout << "data extracted from budget" << endl;
+    }
+    if(parse.readFile(QString(outputPath.c_str()))){
         sout << "data successfully exported to JSON" << endl;
     }
     runCount++;
+    return true;
 }
 
 /*

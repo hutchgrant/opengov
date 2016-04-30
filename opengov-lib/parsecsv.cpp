@@ -25,6 +25,8 @@
 parseCSV::parseCSV()
 {
     filename = "";
+    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
+    verboseOut = "verbose.txt";
     init(0, "");
 }
 
@@ -34,7 +36,7 @@ parseCSV::parseCSV()
 void parseCSV::init(int rCount, string qry){
     counter = 0;
     runCount = rCount;
-    query = qry;
+    search = qry;
     total = 0;
     qTotal = "";
     entry = fileObj();
@@ -42,12 +44,40 @@ void parseCSV::init(int rCount, string qry){
 }
 
 /*
+ * Download CSV using wget
+ */
+bool parseCSV::download(){
+    QProcess process;
+    process.start("wget "+ csv);
+    process.waitForFinished();
+    process.close();
+    return true;
+}
+
+/*
+ * Extract queried data, output to file, read from file
+ */
+bool parseCSV::query(int count, QString qSearch){
+    QProcess process;
+    QString qFind = "";
+
+    init(count, qSearch.toStdString());
+
+    qFind = "bash -c \"grep -i '"+qSearch+"' pa_volume_3_0.csv " +">" + verboseOut + "\"";
+
+    process.start(qFind);
+    process.waitForFinished();
+    process.close();
+    return true;
+}
+
+/*
  * read text file for grep'd data, send to parser
  */
-bool parseCSV::readFile(QString input, QString output){
+bool parseCSV::readFile(QString output){
     filename = output;
 
-    QFile inputFile(input);
+    QFile inputFile(verboseOut);
     if (inputFile.open(QIODevice::ReadOnly))
     {
        QTextStream in(&inputFile);
@@ -58,12 +88,13 @@ bool parseCSV::readFile(QString input, QString output){
        inputFile.close();
     }
 
-    entry.school = query;
+    entry.school = search;
     entry.provTotal = total;
 
     if(writeFile(entry.covertToJSON(runCount))){
         return true;
     }
+    return false;
 }
 
 /*

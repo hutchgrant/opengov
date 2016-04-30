@@ -44,6 +44,11 @@ make
 ```
 ./opengov
 ```
+- Future releases will include a GUI. It's a work in progress. You can test it with:
+```
+./opengov-gui
+```
+
 JSON will export by default to the application's path, in a file called "data.json"
 
 You can export JSON to a specific path by adding your path as an argument

@@ -22,11 +22,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QProcess>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <cstring>
-#include <src/fileobj.h>
+#include <fileobj.h>
 
 using namespace std;
 class parseCSV
@@ -36,21 +37,20 @@ public:
     int runCount;
     long total;
     QString qTotal;
-    string query;
+    string search;
     QString filename;
+    QString csv;
+    QString verboseOut;
 
     parseCSV();
     void init(int rCount, string qry);
-    bool readFile(QString input, QString output);
+    bool download();
+    bool query(int count, QString qSearch);
+    bool readFile(QString output);
     bool writeFile(QString stream);
     bool endJSON();
     void parse(QString line);
     void printFile();
-
-    void setSearch(string search){
-        query = search;
-    }
-
 private:
     fileObj entry;
 };
