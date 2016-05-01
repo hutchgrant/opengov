@@ -63,7 +63,7 @@ bool parseCSV::query(int count, QString qSearch){
 
     init(count, qSearch.toStdString());
 
-    qFind = "bash -c \"grep -i '"+qSearch+"' pa_volume_3_0.csv " +">" + verboseOut + "\"";
+    qFind = "bash -c \"grep -i -a '"+qSearch+"' pa_volume_3_0.csv " +">" + verboseOut + "\"";
 
     process.start(qFind);
     process.waitForFinished();
