@@ -13,7 +13,7 @@ class jsonDisplay : public QWidget
 
 public:
     explicit jsonDisplay(QWidget *parent = 0);
-    void setView(QString data);
+    void setView(int tab, QString data);
     virtual ~jsonDisplay();
 
 private:

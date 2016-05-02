@@ -45,6 +45,7 @@ public:
     QString jsonOut;
     bool errorFound;
     QString jData;
+    QString verbData;
 
     parseCSV();
     virtual ~parseCSV();
@@ -52,10 +53,11 @@ public:
     bool download();
     bool query(int count, QString qSearch);
     bool readFile();
+    bool fillVerbData();
+    bool fillJsonData(QString data);
     int  readJsonFile();
     bool appendJson(QStringList row, QString data);
     bool writeFile();
-    bool endJSON();
     void parse(QString line);
     void printFile();
     bool startProcess(QString bash);

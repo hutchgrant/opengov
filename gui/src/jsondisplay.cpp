@@ -8,9 +8,14 @@ jsonDisplay::jsonDisplay(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void jsonDisplay::setView(QString data){
-    ui->jsonView->clear();
-    ui->jsonView->insertPlainText(data);
+void jsonDisplay::setView(int tab, QString data){
+
+    if(tab == 0){
+        ui->jsonView->clear();
+        ui->jsonView->insertPlainText(data);
+    }else{
+        ui->csvView->insertPlainText(data);
+    }
 }
 
 jsonDisplay::~jsonDisplay()

@@ -31,7 +31,7 @@ void base::init(){
 }
 
 /*
- *  Initialize and add Add each widget to its corresponding layout
+ *  Initialize and add each widget to its corresponding layout
  */
 void base::addWidgets(){
    display = new jsonDisplay(this);
@@ -47,9 +47,10 @@ void base::addWidgets(){
 bool base::extract(QString input){
     if(parse.download()){
         if(parse.query(runCount, input)){
+            display->setView(1,parse.verbData);
             if(parse.readFile()){
                 if(parse.writeFile()){
-                    display->setView(parse.jData);
+                    display->setView(0, parse.jData);
                     runCount++;
                     return true;
                 }
