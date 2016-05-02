@@ -70,7 +70,7 @@ public slots:
     }
     void set(int item, const char *inst, const char *amount, const char *res){
         if (objSize >= InitSize-1){
-            REinitFile(InitSize, 1000);
+            REinitFile(InitSize, 100);
         }
         setInstitution(item, inst);
         setAmt(item, amount);

@@ -38,19 +38,27 @@ public:
     long total;
     QString qTotal;
     string search;
-    QString filename;
     QString csv;
+    QString csvPath;
     QString verboseOut;
+    QString jsonOut;
 
     parseCSV();
     void init(int rCount, string qry);
     bool download();
     bool query(int count, QString qSearch);
-    bool readFile(QString output);
-    bool writeFile(QString stream);
+    bool readFile();
+    bool writeFile();
     bool endJSON();
     void parse(QString line);
     void printFile();
+
+    void setPaths(QString csvUrl, QString cPath, QString verb, QString jOut){
+        csv = csvUrl;
+        csvPath = cPath;
+        verboseOut = verb;
+        jsonOut = jOut;
+    }
 private:
     fileObj entry;
 };

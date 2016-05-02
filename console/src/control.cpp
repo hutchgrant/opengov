@@ -22,9 +22,20 @@
 /*
  *  Constructor
  */
-control::control()
+control::control(QString jPath)
 {
     runCount = 0;
+    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
+    csvPath = "pa_volume_3_0.csv";
+    verboseOut = "verbose.txt";
+    jsonDefault = "data.json";
+
+    if(!jPath.isEmpty()){
+        jsonOut = jPath;
+    }else{
+        jsonOut = jsonDefault;
+    }
+    parse.setPaths(csv, csvPath, verboseOut, jsonOut);
 }
 
 /*
@@ -40,10 +51,15 @@ bool control::manageInstall(){
     if(qInstall == "y"){
        sout << "downloading..." << endl;
        if(parse.download()){
-        sout << "data installed" << endl;
+         sout << "data installed" << endl;
+         return true;
+       }else{
+         sout << "error downloading." << endl;
+         return false;
        }
-     }
-     return true;
+    }else{
+        return true;
+    }
 }
 
 /*
@@ -51,8 +67,7 @@ bool control::manageInstall(){
  *  Grep all data for lines containing query
  *  export to file, parse file
  */
-bool control::manageQueries(string outputPath){
-
+bool control::manageQueries(){
     QTextStream sin(stdin);
     QTextStream sout(stdout);
     QString qSearch = "";
@@ -62,12 +77,20 @@ bool control::manageQueries(string outputPath){
 
     if(parse.query(runCount, qSearch)){
         sout << "data extracted from budget" << endl;
+        if(parse.readFile()){
+            sout << "data successfully exported to JSON" << endl;
+            if(parse.writeFile()){
+                if(jsonOut == jsonDefault){
+                    sout << "JSON File exported to: " << QDir::currentPath() << "/" << jsonDefault << endl;
+                }else{
+                    sout << "JSON File exported to: " << jsonOut << endl;
+                }
+                runCount++;
+                return true;
+            }
+        }
     }
-    if(parse.readFile(QString(outputPath.c_str()))){
-        sout << "data successfully exported to JSON" << endl;
-    }
-    runCount++;
-    return true;
+    return false;
 }
 
 /*

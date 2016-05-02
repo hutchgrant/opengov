@@ -23,19 +23,15 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    control cntrl;
+    control cntrl(argv[1]);
     bool exit = false;
     if(cntrl.manageInstall()){
-        if(!argv[1]){
-            argv[1] = "data.json";
-        }
-        while(exit == false){
-            if(cntrl.manageQueries(argv[1])){
+       while(exit == false){
+            if(cntrl.manageQueries()){
                 exit = cntrl.manageLoop();
             }
         }
         return 0;
     }
-
     return a.exec();
 }

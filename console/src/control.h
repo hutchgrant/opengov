@@ -32,10 +32,15 @@ public:
     parseCSV parse;
     string *query;
     int runCount;
+    QString csv;
+    QString csvPath;
+    QString verboseOut;
+    QString jsonOut;
+    QString jsonDefault;
 
-    control();
+    control(QString jPath);
     bool manageInstall();
-    bool manageQueries(string filepath);
+    bool manageQueries();
     bool manageLoop();
 };
 

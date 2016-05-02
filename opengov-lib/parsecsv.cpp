@@ -24,9 +24,6 @@
  */
 parseCSV::parseCSV()
 {
-    filename = "";
-    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
-    verboseOut = "verbose.txt";
     init(0, "");
 }
 
@@ -60,10 +57,11 @@ bool parseCSV::download(){
 bool parseCSV::query(int count, QString qSearch){
     QProcess process;
     QString qFind = "";
+    runCount = count;
 
     init(count, qSearch.toStdString());
 
-    qFind = "bash -c \"grep -i -a '"+qSearch+"' pa_volume_3_0.csv " +">" + verboseOut + "\"";
+    qFind = "bash -c \"grep -i -a '"+ qSearch +"' "+ csvPath +">" + verboseOut + "\"";
 
     process.start(qFind);
     process.waitForFinished();
@@ -74,9 +72,7 @@ bool parseCSV::query(int count, QString qSearch){
 /*
  * read text file for grep'd data, send to parser
  */
-bool parseCSV::readFile(QString output){
-    filename = output;
-
+bool parseCSV::readFile(){
     QFile inputFile(verboseOut);
     if (inputFile.open(QIODevice::ReadOnly))
     {
@@ -90,18 +86,15 @@ bool parseCSV::readFile(QString output){
 
     entry.school = search;
     entry.provTotal = total;
-
-    if(writeFile(entry.covertToJSON(runCount))){
-        return true;
-    }
-    return false;
+    return true;
 }
 
 /*
  *  Write formatted JSON data to text file
  */
-bool parseCSV::writeFile(QString data){
-    QFile file(filename);
+bool parseCSV::writeFile(){
+    QString data = entry.covertToJSON(runCount);
+    QFile file(jsonOut);
     if(file.exists() && runCount == 0){
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
             QTextStream stream(&file);
@@ -124,16 +117,10 @@ bool parseCSV::writeFile(QString data){
  *  End formatting of JSON text file
  */
 bool parseCSV::endJSON(){
-    QFile file(filename);
+    QFile file(jsonOut);
     if (file.open(QIODevice::ReadWrite | QIODevice::Append)) {
         QTextStream stream(&file);
         stream << "]" << endl;
-    }
-    QTextStream sout(stdout);
-    if(filename == "data.json"){
-        sout << "JSON File exported to: " << QDir::currentPath() << "/data.json" << endl;
-    }else{
-        sout << "JSON File exported to: " << filename << endl;
     }
     return true;
 }
@@ -147,13 +134,13 @@ void parseCSV::parse(QString line){
     QString amtClean = "";
     string amt = "", reason = "", institution = "";
     if(line.section(',', 0, 0).indexOf("\"") == 0){
-        // if quote found at start of line
+        //  first column
         // their is an exception within some ministry titles, where some columns contain a comma, accompanied by a quote,
         institution = line.section(',', 0, 0).replace(QString("\""),QString("")).toStdString();
         if(line.section(',', 2, 2).indexOf("\"") == 0){
-            // if quotes found in the second column, skip to 4th comma(3rd column); same exception
+             //third column; same exception
             if(line.section(',', 4, 4).indexOf("\"") == 0){
-                // if quotes found in the fourth column, skip to 6th comma(seventh column); same exception
+                //fifth column; same exception
                 reason = line.section(',', 4, 5).toStdString();
                 amt = line.section(',', 14, 15).toStdString();
             }else{
@@ -170,9 +157,9 @@ void parseCSV::parse(QString line){
     }else{
         institution = line.section(',', 0, 0).toStdString();
             if(line.section(',', 2, 2).indexOf("\"") == 0){
-                // if quotes found in the second column, skip to 4th comma(3rd column); same exception
+                 //third column; same exception
                 if(line.section(',', 4, 4).indexOf("\"") == 0){
-                    // if quotes found in the fifth column; same exception // have yet to find this exception may cause error
+                     //fifth column; same exception
                     reason = line.section(',', 4, 5).toStdString();
                     amt = line.section(',', 13, 16).toStdString();
                 }else{
