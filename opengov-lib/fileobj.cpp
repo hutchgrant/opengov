@@ -28,6 +28,7 @@ fileObj::fileObj()
 {
     school = "";
     provTotal = 0;
+    qProvTotal = "";
     objSize = 0;
     InitSize = INITSIZE;
     initFile(INITSIZE);
@@ -130,18 +131,18 @@ void fileObj::display(){
  * Display JSON
  */
 QString fileObj::covertToJSON(int runCount){
-    QString qSchool = "", qTotal = "", totalForm = "", amtWcomma = "", qOpen="";
+    QString qSchool = "", qTotal = "", amtWcomma = "", qOpen="";
     string jAmt = "", jInstitution = "", jReason = "";
     std::stringstream stream;
 
     // format total
     qTotal= QString::number(provTotal);
-    totalForm = qTotal.insert(qTotal.length()-3, ",");
-    totalForm = totalForm.insert(qTotal.length()-7, ",");
+    qProvTotal = qTotal.insert(qTotal.length()-3, ",");
+    qProvTotal = qProvTotal.insert(qTotal.length()-7, ",");
     if(qTotal.length() > 10){
-        totalForm = totalForm.insert(qTotal.length()-10, ",");
+        qProvTotal = qProvTotal.insert(qTotal.length()-10, ",");
     }
-    qTotal = "\"provTotal\":\""+ totalForm+"\", ";
+    qTotal = "\"provTotal\":\""+ qProvTotal+"\", ";
 
     // format school
     qSchool = "\"title\":\""+QString(school.c_str())+"\", ";

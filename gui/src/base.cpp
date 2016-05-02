@@ -10,10 +10,9 @@ base::base(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    init();
     addWidgets();
     connect(opt,SIGNAL(btnSearchClick(QString)), this, SLOT(getSearch(QString)));
-
-    init();
 }
 
 /*
@@ -39,6 +38,10 @@ void base::addWidgets(){
 
    ui->jsondisplay_layout->addWidget(display, 0 ,0);
    ui->options_layout->addWidget(opt, 0 ,0);
+
+   QString jPath =  QDir::currentPath() + "/" + jsonDefault;
+   QString cPath = QDir::currentPath() + "/" + csvPath;
+   display->setExportPath(jPath, cPath);
 }
 
 /*
@@ -47,10 +50,11 @@ void base::addWidgets(){
 bool base::extract(QString input){
     if(parse.download()){
         if(parse.query(runCount, input)){
-            display->setView(1,parse.verbData);
             if(parse.readFile()){
+                display->setView(1,parse.verbData);
                 if(parse.writeFile()){
                     display->setView(0, parse.jData);
+                    opt->setResults(parse.getQTotal(), parse.counter);
                     runCount++;
                     return true;
                 }

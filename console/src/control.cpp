@@ -37,7 +37,6 @@ control::control(QString jPath)
     }
     parse.setPaths(csv, csvPath, verboseOut, jsonOut);
     connect(&parse,SIGNAL(error(int)), this, SLOT(error(int)));
-
 }
 
 /*

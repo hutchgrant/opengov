@@ -69,7 +69,6 @@ bool parseCSV::query(int count, QString qSearch){
     qFind = "bash -c \"grep -i -a '"+ qSearch +"' "+ csvPath +" > " + verboseOut + "\"";
     if(QFile(csvPath).exists()){
         if(startProcess(qFind)){
-            fillVerbData();
             return true;
         }
     }
@@ -81,13 +80,20 @@ bool parseCSV::query(int count, QString qSearch){
  * read text file for grep'd data, send to parser
  */
 bool parseCSV::readFile(){
+    verbData = "";
+    QString line = "";
     QFile inputFile(verboseOut);
     if(inputFile.open(QIODevice::ReadOnly))
     {
+       if(runCount != 0){
+           verbData.insert(0, "\n");
+       }
        QTextStream in(&inputFile);
        while (!in.atEnd())
        {
-          parse(in.readLine());
+            line = in.readLine();
+            verbData.append(line.toStdString().c_str()).append("\n");
+            parse(line);
        }
        inputFile.close();
     }else{
@@ -208,25 +214,6 @@ bool parseCSV::appendJson(QStringList row, QString data){
     }else{
         return false;
     }
-}
-
-/*
- * Fill verbose csv data from txt
- */
-bool parseCSV::fillVerbData(){
-    verbData = "";
-    QFile file(verboseOut);
-    if(file.open(QIODevice::ReadOnly))
-    {
-       QTextStream stream(&file);
-       while (!stream.atEnd())
-       {
-          verbData.append(stream.readLine().toStdString().c_str()).append("\n");
-       }
-       file.close();
-       return true;
-    }
-    return 0;
 }
 
 /*

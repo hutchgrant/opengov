@@ -53,7 +53,6 @@ public:
     bool download();
     bool query(int count, QString qSearch);
     bool readFile();
-    bool fillVerbData();
     bool fillJsonData(QString data);
     int  readJsonFile();
     bool appendJson(QStringList row, QString data);
@@ -69,6 +68,10 @@ public:
     }
     QString getJSON(){
         return entry.covertToJSON(runCount);
+    }
+
+    QString getQTotal(){
+        return entry.getQTotal();
     }
 
 public slots:

@@ -42,6 +42,7 @@ public:
     int objSize;            // Number of Items
     int InitSize;           // Number size before reallocate
     long provTotal;
+    QString qProvTotal;
 
     explicit fileObj();
     fileObj(const fileObj& src);
@@ -125,6 +126,10 @@ public slots:
     QString getQStrName(int pos){
         return QString(institution[pos].c_str());
     }
+    QString getQTotal(){
+        return this->qProvTotal;
+    }
+
     void display();
     QString covertToJSON(int runCount);
 

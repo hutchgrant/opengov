@@ -8,6 +8,9 @@ jsonDisplay::jsonDisplay(QWidget *parent) :
     ui->setupUi(this);
 }
 
+/*
+ * Fill tabs with plain text data
+ */
 void jsonDisplay::setView(int tab, QString data){
 
     if(tab == 0){
@@ -16,6 +19,14 @@ void jsonDisplay::setView(int tab, QString data){
     }else{
         ui->csvView->insertPlainText(data);
     }
+}
+
+/*
+ *  Set tab export path
+ */
+void jsonDisplay::setExportPath(QString jPath, QString csvPath){
+    ui->exportPath->setText(jPath);
+    ui->exportPath_2->setText(csvPath);
 }
 
 jsonDisplay::~jsonDisplay()

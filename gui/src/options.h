@@ -14,6 +14,7 @@ class options : public QWidget
 
 public:
     explicit options(QWidget *parent = 0);
+    void setResults(QString total, int resCount);
     virtual ~options();
 
 private:
