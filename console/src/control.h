@@ -26,11 +26,11 @@
 #include <parsecsv.h>
 
 using namespace std;
-class control
+class control: public QObject
 {
+    Q_OBJECT
 public:
     parseCSV parse;
-    string *query;
     int runCount;
     QString csv;
     QString csvPath;
@@ -39,9 +39,26 @@ public:
     QString jsonDefault;
 
     control(QString jPath);
+    virtual ~control();
     bool manageInstall();
     bool manageQueries();
     bool manageLoop();
+
+public slots:
+    void error(int errorCode){
+        QTextStream sout(stdout);
+        if(errorCode > 0 && errorCode <=5){
+            sout << "Problem was encountered while performing a task." << endl;
+        }else if(errorCode == 6){
+            sout << "Error Installing Data. Check the data link and try again." << endl;
+        }else if(errorCode == 7){
+            sout << "Error querying data" << endl;
+        }else if(errorCode == 8){
+            sout << "Error reading verbose file" << endl;
+        }else if(errorCode == 9){
+            sout << "Error writing JSON file" << endl;
+        }
+    }
 };
 
 #endif // CONTROL_H

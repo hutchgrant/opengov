@@ -36,6 +36,8 @@ control::control(QString jPath)
         jsonOut = jsonDefault;
     }
     parse.setPaths(csv, csvPath, verboseOut, jsonOut);
+    connect(&parse,SIGNAL(error(int)), this, SLOT(error(int)));
+
 }
 
 /*
@@ -49,12 +51,11 @@ bool control::manageInstall(){
     sout << "Install 2014-2015 data? <y/n>" << endl;
     qInstall = sin.readLine();
     if(qInstall == "y"){
-       sout << "downloading..." << endl;
+       sout << "Downloading..." << endl;
        if(parse.download()){
-         sout << "data installed" << endl;
+         sout << "Data installed" << endl;
          return true;
        }else{
-         sout << "error downloading." << endl;
          return false;
        }
     }else{
@@ -78,8 +79,8 @@ bool control::manageQueries(){
     if(parse.query(runCount, qSearch)){
         sout << "data extracted from budget" << endl;
         if(parse.readFile()){
-            sout << "data successfully exported to JSON" << endl;
             if(parse.writeFile()){
+                sout << "data successfully exported to JSON" << endl;
                 if(jsonOut == jsonDefault){
                     sout << "JSON File exported to: " << QDir::currentPath() << "/" << jsonDefault << endl;
                 }else{
@@ -107,8 +108,11 @@ bool control::manageLoop(){
     if(qInput == "y"){
         return false;
     }else{
-        parse.endJSON();
         sout << "goodbye" <<endl;
         return true;
     }
+}
+
+control::~control(){
+
 }

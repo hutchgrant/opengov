@@ -30,8 +30,9 @@
 #include <fileobj.h>
 
 using namespace std;
-class parseCSV
+class parseCSV : public QObject
 {
+    Q_OBJECT
 public:
     int counter;
     int runCount;
@@ -42,25 +43,52 @@ public:
     QString csvPath;
     QString verboseOut;
     QString jsonOut;
+    bool errorFound;
+    QString jData;
 
     parseCSV();
+    virtual ~parseCSV();
     void init(int rCount, string qry);
     bool download();
     bool query(int count, QString qSearch);
     bool readFile();
+    int  readJsonFile();
+    bool appendJson(QStringList row, QString data);
     bool writeFile();
     bool endJSON();
     void parse(QString line);
     void printFile();
-
+    bool startProcess(QString bash);
     void setPaths(QString csvUrl, QString cPath, QString verb, QString jOut){
         csv = csvUrl;
         csvPath = cPath;
         verboseOut = verb;
         jsonOut = jOut;
     }
+    QString getJSON(){
+        return entry.covertToJSON(runCount);
+    }
+
+public slots:
+    /*
+     * Signal Error Codes:
+     *  1 - 5 == process crash/error
+     *  6 Download data error
+     *  7 grep data error
+     *  8 read verbose data error
+     *  9 write json data error
+     */
+    void finished(int errorCode, QProcess::ExitStatus){
+        if(errorCode > 0){
+            errorFound = true;
+            emit error(errorCode);
+        }
+    }
+signals:
+    void error(int);
+
 private:
     fileObj entry;
+    QProcess *process;
 };
-
 #endif // PARSECSV_H

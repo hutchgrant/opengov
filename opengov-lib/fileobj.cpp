@@ -169,7 +169,7 @@ QString fileObj::covertToJSON(int runCount){
         }
         stream << jInstitution.c_str() << jReason.c_str() << jAmt.c_str()<< endl;
     }
-    stream << "]}" << endl;
+    stream << "]}";
     return QString(stream.str().c_str());
 }
 

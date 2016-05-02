@@ -13,11 +13,19 @@ TEMPLATE = app
 
 
 SOURCES += src/main.cpp \
-        src/mainwindow.cpp
+            src/jsondisplay.cpp \
+    src/options.cpp \
+    src/base.cpp
 
-HEADERS  += src/mainwindow.h
+HEADERS  += \
+            src/jsondisplay.h \
+    src/options.h \
+    src/base.h
 
-FORMS    += src/mainwindow.ui
+FORMS    += \
+            src/jsondisplay.ui \
+    src/options.ui \
+    src/base.ui
 
 INCLUDEPATH += ../opengov-lib
 LIBS += -L../opengov-lib -lopengov-lib
