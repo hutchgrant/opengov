@@ -15,17 +15,20 @@ TEMPLATE = app
 SOURCES += src/main.cpp \
             src/jsondisplay.cpp \
     src/options.cpp \
-    src/base.cpp
+    src/base.cpp \
+    src/exportdialog.cpp
 
 HEADERS  += \
             src/jsondisplay.h \
     src/options.h \
-    src/base.h
+    src/base.h \
+    src/exportdialog.h \
 
 FORMS    += \
             src/jsondisplay.ui \
     src/options.ui \
-    src/base.ui
+    src/base.ui \
+    src/exportdialog.ui \
 
 INCLUDEPATH += ../opengov-lib
 LIBS += -L../opengov-lib -lopengov-lib

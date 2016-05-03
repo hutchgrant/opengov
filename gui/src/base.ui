@@ -1,30 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>base</class>
- <widget class="QWidget" name="base">
+ <widget class="QMainWindow" name="base">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>538</width>
-    <height>456</height>
+    <width>496</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>OpenGov 0.0.1</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_9" stretch="2,8">
-     <item>
-      <layout class="QHBoxLayout" name="options_layout"/>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="jsondisplay_layout"/>
-     </item>
-    </layout>
-   </item>
-  </layout>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_9" stretch="2,8">
+      <item>
+       <layout class="QHBoxLayout" name="options_layout"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="jsondisplay_layout"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>496</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExport_JSON_Path"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExport_JSON_Path">
+   <property name="text">
+    <string>Export JSON Path</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
