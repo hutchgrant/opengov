@@ -70,11 +70,11 @@ col 3 reason
 col 12 amt $COUNT
 ```
 
-name = data set name
-url = link to the data set(csv only for now).
-list = name for json object for data rows
-col =  indicate the column you want to extract, next to it is the column number, next to that is the json data title
-$COUNT = indicates that column is to be tallied for a total
+- name = data set name
+- url = link to the data set(csv only for now).
+- list = name for json object for data rows
+- col =  indicate the column you want to extract, next to it is the column number, next to that is the json data title
+- $COUNT = indicates that column is to be tallied for a total
 
 Simply copy budget.cfg to a new text file named yourdata.cfg and put it in the config folder. 
 
