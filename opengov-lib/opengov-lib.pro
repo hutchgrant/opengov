@@ -8,7 +8,9 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES += fileobj.cpp \
-            parsecsv.cpp
+            parsecsv.cpp \
+            config.cpp
 
 HEADERS += fileobj.h \
-            parsecsv.h
+            parsecsv.h \
+            config.h

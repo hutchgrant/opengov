@@ -40,7 +40,21 @@ void options::setResults(QString total, int resCount){
     ui->fundingTotal->setText("$"+total);
 }
 
+/*
+ * Set spinner list
+ */
+void options::setCfgList(QString *list, int listSize){
+    for(int i =0; i< listSize; i++){
+        ui->cfgListBox->addItem(list[i]);
+    }
+}
+
 options::~options()
 {
     delete ui;
+}
+
+void options::on_cfgListBox_currentIndexChanged(int index)
+{
+    emit cfgChoiceChange(index);
 }

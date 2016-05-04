@@ -16,14 +16,12 @@ exportDialog::~exportDialog()
 
 void exportDialog::on_browsePath_clicked()
 {
-    QDir usrDir = QString(getenv("HOME"));
-    QFileDialog iDirect;
+    QDir usrDir;
     usrDir = QFileDialog::getSaveFileName(this, tr("Select JSON export path"), QDir::currentPath(), tr("JSON (*.json)"));
     if(usrDir.dirName() != NULL || usrDir.dirName() != ""){
         jsonPath = usrDir.absolutePath();
          ui->absoluteJPath->setText(jsonPath);
     }
-
 }
 
 void exportDialog::on_buttonBox_accepted()

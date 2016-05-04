@@ -24,6 +24,7 @@
 #include <QTextStream>
 #include <cstring>
 #include <parsecsv.h>
+#include <fileobj.h>
 
 using namespace std;
 class control: public QObject
@@ -32,17 +33,18 @@ class control: public QObject
 public:
     parseCSV parse;
     int runCount;
-    QString csv;
-    QString csvPath;
     QString verboseOut;
     QString jsonOut;
     QString jsonDefault;
+    fileObj obj;
+    int cfgChoice;
 
     control(QString jPath);
     virtual ~control();
     bool manageInstall();
     bool manageQueries();
     bool manageLoop();
+    void printCfgList();
 
 public slots:
     void error(int errorCode){

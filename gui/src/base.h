@@ -37,10 +37,9 @@ class base : public QMainWindow
 public:
     int runCount;
     QString search;
-    QString csv;
-    QString csvPath;
     QString verboseOut;
     QString jsonDefault;
+    int cfgChoice;
     parseCSV parse;
 
     explicit base(QWidget *parent = 0);
@@ -76,7 +75,11 @@ private slots:
             vPath = QDir::currentPath() + "/" + verboseOut;
             display->setExportPath(jsonDefault, vPath);
         }
-        parse.setPaths(csv, csvPath, verboseOut, jsonDefault);
+        parse.setPaths(verboseOut, jsonDefault);
+    }
+
+    void setCfgChoice(int choice){
+        cfgChoice = choice;
     }
 
     void error(int errorCode){

@@ -40,11 +40,10 @@ base::base(QWidget *parent) :
 void base::init(){
     runCount = 0;
     search = "";
-    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
-    csvPath = "pa_volume_3_0.csv";
     verboseOut = "verbose.txt";
     jsonDefault = "data.json";
-    parse.setPaths(csv, csvPath, verboseOut, jsonDefault);
+    cfgChoice = 0;
+    parse.setPaths(verboseOut, jsonDefault);
 }
 
 /*
@@ -60,6 +59,8 @@ void base::addWidgets(){
    ui->menubar->show();
 
     resetJsonPath(jsonDefault);
+
+    opt->setCfgList(parse.getCfgList(), parse.getCfgListSize());
 }
 
 /*
@@ -70,13 +71,14 @@ void base::addConnections(){
     connect(opt,SIGNAL(btnSearchClick(QString)), this, SLOT(getSearch(QString)));
     connect(ui->actionExport_JSON_Path, SIGNAL(triggered()), this, SLOT(showExport()));
     connect(expDg, SIGNAL(pathChanged(QString)), this, SLOT(resetJsonPath(QString)));
-
+    connect(opt, SIGNAL(cfgChoiceChange(int)), this, SLOT(setCfgChoice(int)));
 }
 
 /*
  *  Query grep, read verbose + parse, write json file
  */
 bool base::extract(QString input){
+    parse.selectCfg(cfgChoice);
     if(parse.download()){
         if(parse.query(runCount, input)){
             if(parse.readFile()){

@@ -26,12 +26,17 @@
  */
 fileObj::fileObj()
 {
-    school = "";
-    provTotal = 0;
-    qProvTotal = "";
+    countColumn = 0;
+    countColumnPos = 0;
+    total = 0;
+    qTotal = "";
+    dataURL = "";
+    dataName = "";
+    listName = "";
     objSize = 0;
-    InitSize = INITSIZE;
-    initFile(INITSIZE);
+    colSize = 0;
+    initColNamePos(INITCOLSIZE);
+    initFile(INITSIZE, INITCOLSIZE);
 }
 
 /*
@@ -40,135 +45,160 @@ fileObj::fileObj()
 fileObj::fileObj(const fileObj &src){
 
     if(src.objSize > 0){
-        initFile(src.objSize);
+        initFile(src.InitSize, src.colInitSize);
         for(int i=0; i< src.objSize; i++){
-            set(i,src.institution[i].c_str(), src.amt[i].c_str(), src.reason[i].c_str());
+            setLine(i,src.colSize,src.columns[i]);
         }
-        objSize = src.objSize;
+        for(int i=0; i< src.colSize; i++){
+            setColName(i, src.colName[i]);
+            setColPos(i, src.colPos[i]);
+        }
         InitSize = src.InitSize;
+        colInitSize = src.colInitSize;
+        countColumn = src.countColumn;
+        countColumnPos = src.countColumnPos;
+        dataURL = src.dataURL;
+        dataName = src.dataName;
+        listName = src.listName;
+        total = src.total;
+        qTotal = src.qTotal;
     }
 }
 
 /*
  *  Initialize Object
  */
-void fileObj::initFile(int initSZ){
+void fileObj::initFile(int initLineSz, int initColSz){
     if(objSize > 0){
-        delete [] institution;
-        delete [] amt;
-        delete [] reason;
+        for(int i=0; i<objSize; i++){
+            delete [] columns[i];
+        }
+        delete [] columns;
     }
-
     objSize = 0;
+    colSize = 0;
     InitSize = 0;
-    institution = new string[initSZ];
-    amt = new string[initSZ];
-    reason = new string[initSZ];
-    for(int i=0; i< initSZ; i++){
-        setInit(i, "-", "-", "-");
-    }
+    colInitSize = 0;
+    setInit(initLineSz, initColSz);
 }
 
 /*
  *  Reinitialize Object
  */
-void fileObj::REinitFile(int oldsize, int newsize){
-    //set the new initialize size
-    InitSize = oldsize+newsize;
-    int tempObjSize = 0;
-    string *instCopy, *amtCopy, *reasonCopy;
+void fileObj::REinitFile(int newsize){
+    int oldInitSize = InitSize;
+    int oldColInitSize = colInitSize;
 
-    instCopy = new string[objSize+1];
-    amtCopy = new string[objSize+1];
-    reasonCopy = new string[objSize+1];
-
-    for(int i=0; i< objSize; i++){
-        instCopy[i] = "-";
-        amtCopy[i] = "-";
-        reasonCopy[i] = "-";
+    string **colCopy;
+    colCopy = new string*[InitSize+newsize];
+    for(int i=0; i<InitSize+newsize; i++){
+        colCopy[i] = new string[colInitSize];
+        for(int x=0; x<colInitSize; x++){
+            colCopy[i][x] = "-";
+        }
+    }
+    for(int i=0; i<objSize; i++){
+        for(int x=0; x<colSize; x++){
+            colCopy[i][x] = columns[i][x];
+        }
     }
 
-    for(int i=0; i< objSize; i++){
-        instCopy[i] = institution[i];
-        amtCopy[i] = amt[i];
-        reasonCopy[i] = reason[i];
+    for(int i=0; i<objSize; i++){
+        delete [] columns[i];
     }
-    tempObjSize = objSize;
-    initFile(InitSize);
-    /// refill array fileName fileID filePar array
+    delete [] columns;
 
-    for(int i=0; i< tempObjSize; i++){
-        set(i,instCopy[i].c_str(), amtCopy[i].c_str(), reasonCopy[i].c_str());
+    InitSize = 0;
+    colInitSize = 0;
+    setInit(oldInitSize+newsize, oldColInitSize);
+
+    for(int i =0; i<oldInitSize; i++){
+        for(int x=0; x<colInitSize; x++){
+            columns[i][x] = colCopy[i][x];
+        }
     }
-    delete [] amtCopy;
-    delete [] reasonCopy;
-    delete [] instCopy;
+
+    for(int i=0; i<oldInitSize; i++){
+        delete [] colCopy[i];
+    }
+    delete [] colCopy;
 }
 
 /*
  *  Destructor
  */
 fileObj::~fileObj(){
-    delete [] amt;
-    delete [] institution;
-    delete [] reason;
+    for(int i=0; i<objSize; i++){
+        delete [] columns[i];
+    }
+    delete [] columns;
+    delete [] colName;
+    delete [] colPos;
 }
 
 /*
  *  Display all var
  */
 void fileObj::display(){
-    cout << "obj size is " << objSize << endl;
+    cout << "dataName: "<<dataName.toStdString() << endl;
+    cout << "listName: "<< listName.toStdString() <<endl;
+    cout << "colSize: " << colSize << endl;
+    cout << "objSize: " << objSize << endl;
+    cout << "column names: "<<endl;
+    for(int i=0; i<colSize; i++){
+        cout << i << " colPos " << colPos[i] << " colName: " <<colName[i] << endl;
+    }
     for(int i=0; i< objSize; i++){
-        cout << " Num: " << i
-             << " Institution: " << getInst(i)
-             <<  " Amount: " << getAmt(i)
-            <<  " Reason: " << getReason(i) << endl;
+        cout << " line: " << i;
+        for(int x=0; x<colSize; x++){
+            cout << " column: " << colName[x] << " ";
+            cout << columns[i][x];
+        }
+        cout << endl;
     }
 }
 
 /*
- * Display JSON
+ * Covert to JSON
  */
 QString fileObj::covertToJSON(int runCount){
-    QString qSchool = "", qTotal = "", amtWcomma = "", qOpen="";
-    string jAmt = "", jInstitution = "", jReason = "";
-    std::stringstream stream;
+    QString jTotal = "", qTitle = "", qOpen="";
+    stringstream stream;
 
     // format total
-    qTotal= QString::number(provTotal);
-    qProvTotal = qTotal.insert(qTotal.length()-3, ",");
-    qProvTotal = qProvTotal.insert(qTotal.length()-7, ",");
-    if(qTotal.length() > 10){
-        qProvTotal = qProvTotal.insert(qTotal.length()-10, ",");
+    qTotal= QString::number(total);
+    qTotal = qTotal.insert(qTotal.length()-3, ",");
+    qTotal = qTotal.insert(qTotal.length()-7, ",");
+    if(qTotal.length() > 11){
+        qTotal = qTotal.insert(qTotal.length()-11, ",");
     }
-    qTotal = "\"provTotal\":\""+ qProvTotal+"\", ";
+    jTotal = "\""+ QString(colName[countColumnPos].c_str()) + "\":\"" + qTotal + "\", ";
+    qTotal.startsWith("$");
 
-    // format school
-    qSchool = "\"title\":\""+QString(school.c_str())+"\", ";
+    qTitle = "\"query\":\""+title+"\", ";
     if(runCount == 0){
         qOpen = "{";
     }else{
         qOpen = ",{";
     }
-    stream << qOpen.toStdString().c_str() << qSchool.toStdString().c_str() <<  qTotal.toStdString().c_str()<< endl;
+    stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
+    stream <<  "\""+listName.toStdString()+"\":["<< endl;
 
-    stream <<  "\"funding\":["<< endl;
-    // format funding data
+    // format list data
     for(int i=0; i< objSize; i++){
-
-        jInstitution = "{\"ministry\":\""+QString(getInst(i)).toStdString()+"\", ";
-        jReason = "\"reason\":\""+QString(getReason(i)).toStdString()+"\", ";
-
-        // remove $, leave commas
-        amtWcomma = QString(getAmt(i)).replace(QString("$"), QString(""));
-
-        if(i == objSize-1){
-            jAmt = "\"amt\":"+amtWcomma.toStdString()+"}";
-        }else{
-            jAmt = "\"amt\":"+amtWcomma.toStdString()+"},";
+        stream << "{";
+        for(int x=0; x< colSize; x++){
+            if(x == colSize-1){
+                stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\"";
+            }else{
+                stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\", ";
+            }
         }
-        stream << jInstitution.c_str() << jReason.c_str() << jAmt.c_str()<< endl;
+        if(i == objSize-1){
+            stream << "}" << endl;
+        }else{
+            stream << "}," << endl;
+        }
     }
     stream << "]}";
     return QString(stream.str().c_str());
@@ -182,13 +212,23 @@ fileObj& fileObj::operator=(const fileObj& src){
 
     if(this != &src){
         if(src.objSize > 0){
-            initFile(src.objSize);
-
+            initFile(src.InitSize, src.colInitSize);
             for(int i=0; i< src.objSize; i++){
-                set(i,src.institution[i].c_str(), src.amt[i].c_str(), src.reason[i].c_str());
+                setLine(i,src.colSize,src.columns[i]);
             }
-            objSize = src.objSize;
+            for(int i=0; i< src.colSize; i++){
+                setColName(i, src.colName[i]);
+                setColPos(i, src.colPos[i]);
+            }
             InitSize = src.InitSize;
+            colInitSize = src.colInitSize;
+            countColumn = src.countColumn;
+            countColumnPos = src.countColumnPos;
+            dataURL = src.dataURL;
+            dataName = src.dataName;
+            listName = src.listName;
+            total = src.total;
+            qTotal = src.qTotal;
         }
     }
     return *this;

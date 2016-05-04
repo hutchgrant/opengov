@@ -58,6 +58,26 @@ You can export JSON to a specific path by adding your path as an argument
 
 You can review the verbose extracted data, in a file called "verbose.txt", within the application's path
 
+##Adding Data Sets
+
+In the config folder, you'll find a file called budget.cfg, this is the syntax for a new data set:
+```
+name "2014 Ontario Budget"
+url https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv
+list funding
+col 1 ministry
+col 3 reason
+col 12 amt $COUNT
+```
+
+name = data set name
+url = link to the data set(csv only for now).
+list = name for json object for data rows
+col =  indicate the column you want to extract, next to it is the column number, next to that is the json data title
+$COUNT = indicates that column is to be tallied for a total
+
+Simply copy budget.cfg to a new text file named yourdata.cfg and put it in the config folder. 
+
 ##Contributing
 
 see [Contributing](https://github.com/hutchgrant/opengov/blob/master/CONTRIBUTING.md)

@@ -25,17 +25,16 @@
 control::control(QString jPath)
 {
     runCount = 0;
-    csv = "https://www.ontario.ca/sites/default/files/opendata/pa_volume_3_0.csv";
-    csvPath = "pa_volume_3_0.csv";
     verboseOut = "verbose.txt";
     jsonDefault = "data.json";
+    cfgChoice = 0;
 
     if(!jPath.isEmpty()){
         jsonOut = jPath;
     }else{
         jsonOut = jsonDefault;
     }
-    parse.setPaths(csv, csvPath, verboseOut, jsonOut);
+    parse.setPaths(verboseOut, jsonOut);
     connect(&parse,SIGNAL(error(int)), this, SLOT(error(int)));
 }
 
@@ -44,15 +43,21 @@ control::control(QString jPath)
  */
 bool control::manageInstall(){
     QTextStream sin(stdin);
-    QTextStream sout(stdout);
     QString qInstall = "";
 
-    sout << "Install 2014-2015 data? <y/n>" << endl;
+    cout << "Welcome to OpenGov" << endl;
+    cout << "Select a Data Set for querying and extraction:" << endl;
+    printCfgList();
+
+    cout << "enter dataset index number: ";
+    cfgChoice = sin.readLine().toInt();
+    parse.selectCfg(cfgChoice);
+    cout << "Install data from "<< parse.getDataName().toStdString().c_str()<<" <y/n>" << endl;
     qInstall = sin.readLine();
     if(qInstall == "y"){
-       sout << "Downloading..." << endl;
+       cout << "Downloading..." << endl;
        if(parse.download()){
-         sout << "Data installed" << endl;
+         cout << "Data installed" << endl;
          return true;
        }else{
          return false;
@@ -75,6 +80,7 @@ bool control::manageQueries(){
     sout << "Enter a string to search:" << endl;
     qSearch = sin.readLine();
 
+    parse.selectCfg(cfgChoice);
     if(parse.query(runCount, qSearch)){
         sout << "data extracted from budget" << endl;
         if(parse.readFile()){
@@ -109,6 +115,21 @@ bool control::manageLoop(){
     }else{
         sout << "goodbye" <<endl;
         return true;
+    }
+}
+
+/*
+ *  Output the Config file list
+ */
+void control::printCfgList(){
+    int cfgSize = parse.getCfgListSize();
+    QString *cfg;
+    cfg = new QString[cfgSize];
+    cfg = parse.getCfgList();
+    cout<< "Index" << " | " << "Data Set"<<endl;
+    cout<<"---------------------------------" <<endl;
+    for(int i=0; i<cfgSize; i++){
+       cout<< i << " | " << cfg[i].toStdString() << endl;
     }
 }
 

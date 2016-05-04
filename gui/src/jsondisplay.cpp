@@ -25,6 +25,7 @@ jsonDisplay::jsonDisplay(QWidget *parent) :
     ui(new Ui::jsonDisplay)
 {
     ui->setupUi(this);
+
 }
 
 /*

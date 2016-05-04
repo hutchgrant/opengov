@@ -17,20 +17,36 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <QCoreApplication>
-#include <src/control.h>
+#ifndef CONFIG_H
+#define CONFIG_H
 
-int main(int argc, char *argv[])
+#define CFGSIZE 10
+#include <QString>
+#include <QDir>
+#include <QDirIterator>
+#include <fileobj.h>
+
+using namespace std;
+class config
 {
-    QCoreApplication a(argc, argv);
-    control cntrl(argv[1]);
-    bool exit = false;
-    if(cntrl.manageInstall()){
-           while(exit == false){
-                if(cntrl.manageQueries()){
-                    exit = cntrl.manageLoop();
-                }
-            }
-        }
-    return 0;
-}
+public:
+    QString cfgPath;
+    QString *cfgList;
+    int cfgAmt, cfgLineCount, cfgColCount;
+
+    config();
+    void initCfgList();
+    bool readCfgList();
+    bool readCfg(int pos, fileObj *obj);
+    void parseCfg(QString line, fileObj *obj);
+    virtual ~config();
+
+    QString *getCfgList(){
+        return cfgList;
+    }
+    int getCfgListSize(){
+        return cfgAmt;
+    }
+};
+
+#endif // CONFIG_H

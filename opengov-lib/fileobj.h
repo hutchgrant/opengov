@@ -22,6 +22,7 @@
 #define FILEOBJ_H
 
 #define INITSIZE 3
+#define INITCOLSIZE 10
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -35,103 +36,150 @@ class fileObj : public QObject
 {
     Q_OBJECT
 public:
-    string school;
-    string *institution;    // ministry name
-    string *amt;            // amt of funding
-    string *reason;         // reason for funding
-    int objSize;            // Number of Items
-    int InitSize;           // Number size before reallocate
-    long provTotal;
-    QString qProvTotal;
+    QString dataName, listName;  // titles of the overall data, list of data
+    QString dataURL;        // URL for downloading data set
+    string **columns;       // all lines + columns
+    string *colName;        // all column names
+    int objSize;            // Actual number of Items/lines
+    int InitSize;           // Amt of lines before reallocate
+    int colSize;            // Actual number of columns per line
+    int colInitSize;        // Amt of columns per line before allocate
+    int *colPos;            // Position of the preferred column in data
+    int countColumn;        // Column position used to calculate total
+    int countColumnPos;     // index position in colName array used to calculate total
+    long total;             // Total from column with $Count param
+    QString title;          // Title(from search input)
+    QString qTotal;         // String with commas of total from column with $Count param
 
     explicit fileObj();
     fileObj(const fileObj& src);
     fileObj& operator=(const fileObj& src);
     fileObj* operator=(const fileObj* src);
 
-    void initFile(int initSZ);
-    void REinitFile(int oldsize, int newsize);
+    void initFile(int initLineSz, int initColSz);
+    void REinitFile(int newsize);
 
     virtual ~fileObj();
 public slots:
-    void setInstitution(int item, const char *inst){
-        if(item >= 0 && item <= objSize){
-            institution[item] = inst;
-        }
-    }
-    void setAmt(int item, const char *amount){
-        if(item >= 0 && item <= objSize){
-            amt[item] = amount;
-        }
-    }
-    void setReason(int item, const char *res){
-        if(item >= 0 && item <= objSize){
-            reason[item] = res;
-        }
-    }
-    void set(int item, const char *inst, const char *amount, const char *res){
-        if (objSize >= InitSize-1){
-            REinitFile(InitSize, 100);
-        }
-        setInstitution(item, inst);
-        setAmt(item, amount);
-        setReason(item, res);
-        objSize++;
-    }
-    void setInit(int item, const char *inst, const char *amount, const char *res){
-        setInstitution(item, inst);
-        setAmt(item, amount);
-        setReason(item, res);
-        InitSize++;
-    }
-    void setSize(int size){
-        objSize = size;
-
-    }
-
-    char *getInst(int item){
-        char *final;
-        if(item <= objSize){
-            final = new char[institution[item].length()+1];
-            strcpy(final, institution[item].c_str());
-        }else{
-            string name = "-";
-            final = new char[name.length()+1];
-            strcpy(final, name.c_str());
-        }
-        return final;
-    }
-    char *getAmt(int item){
-        char *final;
-        final = new char[amt[item].length()+1];
-        strcpy(final, amt[item].c_str());
-        return final;
-    }
-    char *getReason(int item){
-        char *final;
-        final = new char[reason[item].length()+1];
-        strcpy(final, reason[item].c_str());
-        return final;
-    }
-
-    int getSize(){
-        return objSize;
-    }
-    void setInit(int initItem){
-        InitSize = initItem;
-    }
-    int getInit(){
-        return InitSize;
-    }
-    QString getQStrName(int pos){
-        return QString(institution[pos].c_str());
-    }
-    QString getQTotal(){
-        return this->qProvTotal;
-    }
-
     void display();
     QString covertToJSON(int runCount);
+    void setInit(int lines, int cols){
+        columns = new string*[lines];
+        for(int i = 0; i < lines; i++){
+            columns[i] = new string[cols];
+            for(int x=0; x<cols; x++){
+                if(i == 0){
+                    colInitSize++;
+                }
+                columns[i][x] = "-";
+            }
+            InitSize++;
+        }
+    }
+
+    void initColNamePos(int colSz){
+        colName = new string[colSz];
+        colPos = new int[colSz];
+        for(int i=0; i<colSz; i++){
+            colName[i] = "-";
+        }
+        for(int i=0; i<colSz; i++){
+            colPos[i] = 0;
+        }
+    }
+
+    void setCol(int line, int col, string someStr){
+        if(col >= 0 && col <= colSize && line >=0 && line <=objSize){
+            columns[line][col] = someStr;
+        }
+    }
+    void setLine(int line, int colCount, string *someStr){
+        if(objSize >= InitSize-1){
+            REinitFile(100);
+        }
+        for(int i=0; i< colCount; i++){
+            setCol(line, i, someStr[i]);
+        }
+        objSize++;
+    }
+    void setLine(int line, int colCount, QString *someStr){
+        if(objSize >= InitSize-1){
+            REinitFile(100);
+        }
+        for(int i=0; i< colCount; i++){
+            setCol(line, i, someStr[i].toStdString());
+        }
+        objSize++;
+    }
+    void setColName(int col, string name){
+        colName[col] = name;
+    }
+    string getColName(int col){
+        return colName[col];
+    }
+    void setColPos(int col, int pos){
+        colPos[col] = pos;
+        colSize++;
+    }
+    int getColPos(int col){
+        return colPos[col];
+    }
+    void setName(QString name){
+        dataName = name;
+    }
+    QString getName(){
+        return dataName;
+    }
+    void setURL(QString url){
+        dataURL = url;
+    }
+    QString getURL(){
+        return dataURL;
+    }
+    void setListName(QString name){
+        listName = name;
+    }
+    QString getListName(){
+        return listName;
+    }
+    int getColSize(){
+        return colSize;
+    }
+    int getObjSize(){
+        return objSize;
+    }
+    void setCountingColumn(int pos, int countCol){
+        countColumn = countCol;
+        countColumnPos = pos;
+    }
+    int getCountingColumn(){
+        return countColumn;
+    }
+    int getCountColumnPos(){
+        return countColumnPos;
+    }
+
+    string getColumn(int line, int colPos){
+        if(line <= objSize && colPos <= colSize){
+            return columns[line][colPos];
+        }
+    }
+    string *getLine(int line){
+        if(line <= objSize){
+            return columns[line];
+        }
+    }
+    void setTotal(long calc){
+        total = calc;
+    }
+
+    void setTitle(QString name){
+        title = name;
+    }
+
+    QString getQTotal(){
+        return qTotal;
+    }
 
 };
 #endif // FILEOBJ_H

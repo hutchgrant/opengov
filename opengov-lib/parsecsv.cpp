@@ -25,6 +25,7 @@
 parseCSV::parseCSV()
 {
     init(0, "");
+    readCfg();
 }
 
 /*
@@ -37,17 +38,21 @@ void parseCSV::init(int rCount, string qry){
     total = 0;
     qTotal = "";
     errorFound = false;
-    entry = fileObj();
-    entry.initFile(100);
     jData = "";
     verbData = "";
+}
+
+void parseCSV::selectCfg(int choice){
+    entry.initFile(10,INITCOLSIZE);
+    cfg.readCfg(choice, &entry);
+    csv = entry.getURL();
+    csvPath = csv.mid(csv.lastIndexOf("/")+1, csv.size());
 }
 
 /*
  * Download CSV using wget
  */
 bool parseCSV::download(){
-
     if(!QFile(csvPath).exists()){
         if(startProcess("wget "+csv)){
             return true;
@@ -80,6 +85,7 @@ bool parseCSV::query(int count, QString qSearch){
  * read text file for grep'd data, send to parser
  */
 bool parseCSV::readFile(){
+    int colSize = entry.getColSize();
     verbData = "";
     QString line = "";
     QFile inputFile(verboseOut);
@@ -93,7 +99,7 @@ bool parseCSV::readFile(){
        {
             line = in.readLine();
             verbData.append(line.toStdString().c_str()).append("\n");
-            parse(line);
+            parse(line, colSize);
        }
        inputFile.close();
     }else{
@@ -101,8 +107,8 @@ bool parseCSV::readFile(){
         return false;
     }
 
-    entry.school = search;
-    entry.provTotal = total;
+    entry.setTotal(total);
+    entry.setTitle(QString(search.c_str()));
     return true;
 }
 
@@ -220,58 +226,36 @@ bool parseCSV::appendJson(QStringList row, QString data){
  *  Parse data, seperate the necessary columns into variables, pre-formatting
  *  calculate the total of all financial figures found
  */
-void parseCSV::parse(QString line){
-
-    QString amtClean = "";
-    string amt = "", reason = "", institution = "";
-    if(line.section(',', 0, 0).indexOf("\"") == 0){
-        //  first column
-        // their is an exception within some ministry titles, where some columns contain a comma, accompanied by a quote,
-        institution = line.section(',', 0, 0).replace(QString("\""),QString("")).toStdString();
-        if(line.section(',', 2, 2).indexOf("\"") == 0){
-             //third column; same exception
-            if(line.section(',', 4, 4).indexOf("\"") == 0){
-                //fifth column; same exception
-                reason = line.section(',', 4, 5).toStdString();
-                amt = line.section(',', 14, 15).toStdString();
-            }else{
-                reason = line.section(',', 4, 4).toStdString();
-                amt = line.section(',', 13, 15).toStdString();
-            }
-        }else{
-            reason = line.section(',', 3, 3).toStdString();
-            amt = line.section(',', 12, 15).toStdString();
-        }
-        // format for integer conversion, add for total, remove quotes and $
-        amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
-        total += amtClean.toLong();
-    }else{
-        institution = line.section(',', 0, 0).toStdString();
-            if(line.section(',', 2, 2).indexOf("\"") == 0){
-                 //third column; same exception
-                if(line.section(',', 4, 4).indexOf("\"") == 0){
-                     //fifth column; same exception
-                    reason = line.section(',', 4, 5).toStdString();
-                    amt = line.section(',', 13, 16).toStdString();
-                }else{
-                    reason = line.section(',', 4, 4).toStdString();
-                    amt = line.section(',', 13, 15).toStdString();
-                }
-            }else{
-                if(line.section(',', 4, 4).indexOf("\"") == 0){
-                    // if quotes found in the fifth column; same exception
-                    reason = line.section(',', 2, 2).toStdString();
-                    amt = line.section(',', 13, 16).toStdString();
-                }else{
-                    reason = line.section(',', 2, 2).toStdString();
-                    amt = line.section(',', 11, 15).toStdString();
-                }
-            }
-        // format for integer conversion, add for total
-        amtClean = QString(amt.substr(2, amt.length()-3).c_str()).replace(QString(","), QString(""));
-        total += amtClean.toLong();
+void parseCSV::parse(QString line, int colSize){
+    int commaAmt = 0;
+    QString amtWComma = "";
+    QString *cols;
+    cols = new QString[colSize];
+    for(int i=0; i<colSize; i++){
+        cols[i] = "";
     }
-    entry.set(counter, institution.c_str(), amt.c_str(), reason.c_str());
+    for(int i=0; i<colSize; i++){
+        cols[i] = line.section(",",entry.getColPos(i)+commaAmt,entry.getColPos(i)+commaAmt);
+        if(cols[i].indexOf("\"") == 0){
+            if(!cols[i].endsWith("\"")){
+                int count = 0;
+                while(!cols[i].endsWith("\"")){
+                    cols[i] = line.section(",",entry.getColPos(i)+commaAmt,entry.getColPos(i)+commaAmt+count);
+                    count++;
+                }
+                commaAmt += cols[i].count(",");
+                cols[i].replace("\"", "");
+            }
+        }
+        if(i == entry.getCountColumnPos()){
+            cols[i].replace("$", "");
+            amtWComma = cols[i];
+            amtWComma.replace(",", "");
+            total += amtWComma.toLong();
+        }
+    }
+    entry.setLine(counter, colSize, cols);
+    delete [] cols;
     counter++;
 }
 

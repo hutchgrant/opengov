@@ -27,7 +27,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <cstring>
+#include <algorithm>
 #include <fileobj.h>
+#include <config.h>
 
 using namespace std;
 class parseCSV : public QObject
@@ -50,6 +52,7 @@ public:
     parseCSV();
     virtual ~parseCSV();
     void init(int rCount, string qry);
+    void selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
     bool readFile();
@@ -57,19 +60,27 @@ public:
     int  readJsonFile();
     bool appendJson(QStringList row, QString data);
     bool writeFile();
-    void parse(QString line);
+    void parse(QString line, int colSize);
     void printFile();
     bool startProcess(QString bash);
-    void setPaths(QString csvUrl, QString cPath, QString verb, QString jOut){
-        csv = csvUrl;
-        csvPath = cPath;
+    void setPaths(QString verb, QString jOut){
         verboseOut = verb;
         jsonOut = jOut;
     }
-    QString getJSON(){
-        return entry.covertToJSON(runCount);
+    void readCfg(){
+        cfg.readCfgList();
     }
 
+    QString *getCfgList(){
+        return cfg.getCfgList();
+    }
+    int getCfgListSize(){
+        return cfg.getCfgListSize();
+    }
+
+    QString getDataName(){
+        return entry.getName();
+    }
     QString getQTotal(){
         return entry.getQTotal();
     }
@@ -94,6 +105,7 @@ signals:
 
 private:
     fileObj entry;
+    config cfg;
     QProcess *process;
 };
 #endif // PARSECSV_H

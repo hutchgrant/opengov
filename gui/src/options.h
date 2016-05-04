@@ -35,15 +35,17 @@ public:
     explicit options(QWidget *parent = 0);
     void setResults(QString total, int resCount);
     virtual ~options();
-
+    void setCfgList(QString *list, int listSize);
 private:
     Ui::options *ui;
     QString search;
 private slots:
     void on_btnSearch_clicked();
+    void on_cfgListBox_currentIndexChanged(int index);
 
 signals:
     void btnSearchClick(QString);
+    void cfgChoiceChange(int);
 };
 
 #endif // OPTIONS_H
