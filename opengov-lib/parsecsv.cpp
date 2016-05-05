@@ -37,9 +37,10 @@ void parseCSV::init(int rCount, string qry){
     search = qry;
     total = 0;
     qTotal = "";
-    errorFound = false;
     jData = "";
     verbData = "";
+    errorFound = false;
+    defaultColFlag = false;
 }
 
 void parseCSV::selectCfg(int choice){
@@ -89,6 +90,7 @@ bool parseCSV::readFile(){
     verbData = "";
     QString line = "";
     QFile inputFile(verboseOut);
+    bool colDefaultLine = false;
     if(inputFile.open(QIODevice::ReadOnly))
     {
        if(runCount != 0){
@@ -99,10 +101,10 @@ bool parseCSV::readFile(){
        {
             line = in.readLine();
             verbData.append(line.toStdString().c_str()).append("\n");
-            if(counter > 0){
-                parse(line, colSize);
+            if(search == "" && !colDefaultLine){
+                colDefaultLine = true;
             }else{
-                counter++;
+                parse(line, colSize);
             }
        }
        inputFile.close();
@@ -282,7 +284,7 @@ void parseCSV::parse(QString line, int colSize){
                     cols[x].replace("\"", "");
                 }
                 // $COUNT column condition. if flagged, calculate total of all of these columns, format total and amounts
-                if(entry.getCountColumnFlag() && x == entry.getCountColumnPos()){
+                if(entry.getCountColumnFlag() && x == entry.getCountColumnPos() && !ignoreFlag){
                     cols[x].replace("$", "");
                     amtWComma = cols[x];
                     amtWComma.replace(",", "");
@@ -297,7 +299,7 @@ void parseCSV::parse(QString line, int colSize){
         }
     }
     if(!ignoreFlag){
-        entry.setLine(counter-1, colSize, cols);
+        entry.setLine(counter, colSize, cols);
         counter++;
     }
     delete [] cols;

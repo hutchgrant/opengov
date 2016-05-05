@@ -35,18 +35,19 @@ class parseCSV : public QObject
 {
     Q_OBJECT
 public:
-    int counter;
-    int runCount;
-    long total;
-    QString qTotal;
-    string search;
-    QString csv;
-    QString csvPath;
-    QString verboseOut;
-    QString jsonOut;
-    bool errorFound;
-    QString jData;
-    QString verbData;
+    int counter;            // Parse Line Counter
+    int runCount;           // Overall Count of times run
+    long total;             // Total of $COUNT column
+    QString qTotal;         // formatted total of $COUNT column
+    string search;          // search query
+    QString csv;            // csv data url
+    QString csvPath;        // path to downloaded csv file
+    QString verboseOut;     // path to verbose csv file containing results from searched query
+    QString jsonOut;        // path to json file for output of parsed data
+    QString jData;          // data read from json file
+    QString verbData;       // data read from verbose csv file
+    bool errorFound;        // Flag that an error was discovered
+    bool defaultColFlag;    // Flag that default column names should be removed from results
 
     parseCSV();
     virtual ~parseCSV();
