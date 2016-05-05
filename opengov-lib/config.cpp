@@ -86,10 +86,17 @@ void config::parseCfg(QString line, fileObj *obj){
     QString secCol = line.section(' ', 1, 1);
     QString thirdCol = line.section(' ', 2, 2);
     QString fourthCol = line.section(' ', 3, 3);
+    if(secCol.indexOf("\"")==0){
+        secCol = line.section(("\""), 1,1);
+    }
+    if(thirdCol.indexOf("\"")==0){
+        thirdCol = line.section(("\""), 1,1);
+    }
+    if(fourthCol.indexOf("\"")==0){
+        fourthCol = line.section(("\""), 1,1);
+    }
+
     if(firstCol == "name"){
-        if(secCol.indexOf("\"")==0){
-            secCol = line.section(("\""), 1,1);
-        }
         obj->setName(secCol);
     }else if(firstCol == "url"){
         obj->setURL(secCol);
@@ -97,9 +104,6 @@ void config::parseCfg(QString line, fileObj *obj){
         obj->setListName(secCol);
     }else if(firstCol == "col"){
         if(thirdCol == "$IGNORE"){
-            if(fourthCol.indexOf("\"")==0){
-                fourthCol = line.section(("\""), 1,1);
-            }
             obj->setIgnoreRow(secCol.toInt()-1, fourthCol.toStdString());
         }else{
             obj->setColPos(cfgColCount, secCol.toInt()-1);

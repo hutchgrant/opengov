@@ -69,10 +69,7 @@ fileObj::fileObj(const fileObj &src){
  */
 void fileObj::initFile(int initLineSz, int initColSz){
     if(objSize > 0){
-        for(int i=0; i<objSize; i++){
-            delete [] columns[i];
-        }
-        delete [] columns;
+        removeColumnsArr(objSize);
     }
     objSize = 0;
     colSize = 0;
@@ -174,7 +171,12 @@ QString fileObj::covertToJSON(int runCount){
     QString jTotal = "", qTitle = "", qOpen="";
     stringstream stream;
 
-    qTitle = "\"query\":\""+title+"\", ";
+    if(!title.isEmpty()){
+        qTitle = "\"query\":\""+title+"\", ";
+    }else{
+        qTitle = "";
+    }
+
     if(runCount == 0){
         qOpen = "{";
     }else{
@@ -185,7 +187,9 @@ QString fileObj::covertToJSON(int runCount){
         // format total
         qTotal= QString::number(total);
         qTotal = qTotal.insert(qTotal.length()-3, ",");
-        qTotal = qTotal.insert(qTotal.length()-7, ",");
+        if(qTotal.length() > 7){
+            qTotal = qTotal.insert(qTotal.length()-7, ",");
+        }
         if(qTotal.length() > 11){
             qTotal = qTotal.insert(qTotal.length()-11, ",");
         }

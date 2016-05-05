@@ -67,6 +67,20 @@ public:
 public slots:
     void display();
     QString covertToJSON(int runCount);
+    void removeColumnsArr(int size){
+        for(int i=0; i<size; i++){
+            delete [] columns[i];
+        }
+        delete [] columns;
+    }
+    // re-initialize when array empty, without losing cfg changes
+    void reInitNearEmpty(int row, int col){
+        InitSize = 0;
+        colInitSize = 0;
+        removeColumnsArr(row);
+        setInit(row,col);
+    }
+
     void setInit(int lines, int cols){
         columns = new string*[lines];
         for(int i = 0; i < lines; i++){

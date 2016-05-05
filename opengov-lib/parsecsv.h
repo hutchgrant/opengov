@@ -37,6 +37,7 @@ class parseCSV : public QObject
 public:
     int counter;            // Parse Line Counter
     int runCount;           // Overall Count of times run
+    int colSize;            // Total default columns in first row
     long total;             // Total of $COUNT column
     QString qTotal;         // formatted total of $COUNT column
     string search;          // search query
@@ -47,7 +48,6 @@ public:
     QString jData;          // data read from json file
     QString verbData;       // data read from verbose csv file
     bool errorFound;        // Flag that an error was discovered
-    bool defaultColFlag;    // Flag that default column names should be removed from results
 
     parseCSV();
     virtual ~parseCSV();
@@ -55,6 +55,7 @@ public:
     void selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
+    bool readColumns();
     bool readFile();
     bool fillJsonData(QString data);
     int  readJsonFile();

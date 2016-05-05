@@ -33,6 +33,7 @@ parseCSV::parseCSV()
  */
 void parseCSV::init(int rCount, string qry){
     counter = 0;
+    colSize = 0;
     runCount = rCount;
     search = qry;
     total = 0;
@@ -40,11 +41,13 @@ void parseCSV::init(int rCount, string qry){
     jData = "";
     verbData = "";
     errorFound = false;
-    defaultColFlag = false;
 }
 
+/*
+ * Choose a cfg, read the cfg, initialize parse paths
+ */
 void parseCSV::selectCfg(int choice){
-    entry.initFile(10,INITCOLSIZE);
+    entry.initFile(INITSIZE,INITCOLSIZE);
     cfg.readCfg(choice, &entry);
     csv = entry.getURL();
     csvPath = csv.mid(csv.lastIndexOf("/")+1, csv.size());
@@ -55,11 +58,13 @@ void parseCSV::selectCfg(int choice){
  */
 bool parseCSV::download(){
     if(!QFile(csvPath).exists()){
-        if(startProcess("wget "+csv)){
-            return true;
-        }else{
-           emit error(6);
+        if(!startProcess("wget "+csv)){
+            emit error(6);
+            return false;
         }
+    }
+    if(readColumns()){
+        entry.reInitNearEmpty(INITSIZE, colSize);
     }
     return true;
 }
@@ -80,6 +85,42 @@ bool parseCSV::query(int count, QString qSearch){
     }
     emit error(7);
     return false;
+}
+
+/*
+ *  Count the columns in the CSV first row, for initializing fileObj with colSize
+ */
+bool parseCSV::readColumns(){
+    int approxSize = 0;
+    int totalCount = 0;
+    QString row = "", col = "";
+    QFile file(csvPath);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&file);
+        row = in.readLine();
+        approxSize = row.count(",");
+        for(int i=0; i<=approxSize; i++){
+            col = row.section(",",i,i);
+            if(col.indexOf("\"") == 0){
+                int count = 1;
+                while(!col.endsWith("\"")){
+                    col = row.section("\"",i,i+count);
+                    count++;
+                }
+                i+= count;
+                totalCount += count;
+            }else{
+                totalCount++;
+            }
+        }
+        colSize = totalCount;
+        file.close();
+    }else{
+        emit error(8);
+        return false;
+    }
+    return true;
 }
 
 /*
@@ -305,6 +346,9 @@ void parseCSV::parse(QString line, int colSize){
     delete [] cols;
 }
 
+/*
+ *  Run bash process
+ */
 bool parseCSV::startProcess(QString bash){
     errorFound = false;
     process = new QProcess(this);
