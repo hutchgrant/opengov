@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <cstring>
-#include <algorithm>
 #include <fileobj.h>
 #include <config.h>
 

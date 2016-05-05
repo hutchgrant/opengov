@@ -70,8 +70,8 @@ bool parseCSV::query(int count, QString qSearch){
     QString qFind = "";
 
     init(count, qSearch.toStdString());
-
     qFind = "bash -c \"grep -i -a '"+ qSearch +"' "+ csvPath +" > " + verboseOut + "\"";
+
     if(QFile(csvPath).exists()){
         if(startProcess(qFind)){
             return true;
@@ -99,7 +99,11 @@ bool parseCSV::readFile(){
        {
             line = in.readLine();
             verbData.append(line.toStdString().c_str()).append("\n");
-            parse(line, colSize);
+            if(counter > 0){
+                parse(line, colSize);
+            }else{
+                counter++;
+            }
        }
        inputFile.close();
     }else{
@@ -227,36 +231,76 @@ bool parseCSV::appendJson(QStringList row, QString data){
  *  calculate the total of all financial figures found
  */
 void parseCSV::parse(QString line, int colSize){
-    int commaAmt = 0;
-    QString amtWComma = "";
+    int count = 0, x = 0;
+    int skipColumn = 0, originalSkip = 0;
+    bool skipFlag = false, ignoreFlag = false;
+    QString amtWComma = "",  column = "";
     QString *cols;
+    int colActualSize = line.count(",");
+
     cols = new QString[colSize];
     for(int i=0; i<colSize; i++){
         cols[i] = "";
     }
-    for(int i=0; i<colSize; i++){
-        cols[i] = line.section(",",entry.getColPos(i)+commaAmt,entry.getColPos(i)+commaAmt);
-        if(cols[i].indexOf("\"") == 0){
-            if(!cols[i].endsWith("\"")){
-                int count = 0;
-                while(!cols[i].endsWith("\"")){
-                    cols[i] = line.section(",",entry.getColPos(i)+commaAmt,entry.getColPos(i)+commaAmt+count);
+
+    for(int i=0; i<=colActualSize; i++){
+        skipFlag = false;
+        skipColumn = 0;
+
+        column = line.section(",",i,i);
+
+        // use as index for skipping to correct correct line section(after quotes)
+        if(column.indexOf("\"") == 0){
+            if(!column.endsWith("\"")){
+                count = 0;
+                while(!column.endsWith("\"")){
+                    column = line.section(",",i,i+count);
                     count++;
                 }
-                commaAmt += cols[i].count(",");
-                cols[i].replace("\"", "");
+                skipColumn = count-1;
+                skipFlag = true;
             }
         }
-        if(i == entry.getCountColumnPos()){
-            cols[i].replace("$", "");
-            amtWComma = cols[i];
-            amtWComma.replace(",", "");
-            total += amtWComma.toLong();
+
+        if(i==entry.getColPos(x)+originalSkip){
+            cols[x] = line.section(",",i,i);
+            // ignoreFlag Column condition
+            if(entry.getIgnoreText() == cols[x].toStdString().c_str()){
+                if( entry.getIgnoreRow() && entry.getIgnoreColumn() == entry.getColPos(x)+originalSkip){
+                    ignoreFlag = true;
+                }
+            }else{
+                // quotes found in column condition
+                if(cols[x].indexOf("\"") == 0){
+                    if(!cols[x].endsWith("\"")){
+                        count = 0;
+                        while(!cols[x].endsWith("\"")){
+                            cols[x] = line.section(",",i,i+count);
+                            count++;
+                        }
+                    }
+                    cols[x].replace("\"", "");
+                }
+                // $COUNT column condition. if flagged, calculate total of all of these columns, format total and amounts
+                if(entry.getCountColumnFlag()){
+                    cols[x].replace("$", "");
+                    amtWComma = cols[x];
+                    amtWComma.replace(",", "");
+                    total += amtWComma.toLong();
+                }
+            }
+            x++;
+        }
+        if(skipFlag){
+            i+=skipColumn;
+            originalSkip += skipColumn;
         }
     }
-    entry.setLine(counter, colSize, cols);
+    if(!ignoreFlag){
+        entry.setLine(counter-1, colSize, cols);
+        counter++;
+    }
     delete [] cols;
-    counter++;
 }
 
 bool parseCSV::startProcess(QString bash){

@@ -47,6 +47,10 @@ public:
     int *colPos;            // Position of the preferred column in data
     int countColumn;        // Column position used to calculate total
     int countColumnPos;     // index position in colName array used to calculate total
+    bool countColumnFlag;   // Flag that indicates whether a $COUNT is found in config
+    int ignoreColumn;       // Column position used to ignore text
+    bool ignoreRow;         // Flag that indicates whether a $IGNORE is found in config
+    string ignoreText;      // Text found in column, to be used for ignoring a column
     long total;             // Total from column with $Count param
     QString title;          // Title(from search input)
     QString qTotal;         // String with commas of total from column with $Count param
@@ -151,6 +155,7 @@ public slots:
     void setCountingColumn(int pos, int countCol){
         countColumn = countCol;
         countColumnPos = pos;
+        countColumnFlag = true;
     }
     int getCountingColumn(){
         return countColumn;
@@ -158,11 +163,32 @@ public slots:
     int getCountColumnPos(){
         return countColumnPos;
     }
+    bool getCountColumnFlag(){
+        return countColumnFlag;
+    }
+    void setIgnoreRow(int countCol, string name){
+        ignoreColumn = countCol;
+        ignoreText = name;
+        ignoreRow = true;
+    }
+    int getIgnoreColumn(){
+        return ignoreColumn;
+    }
+    string getIgnoreText(){
+        return ignoreText;
+    }
+    bool getIgnoreRow(){
+        return ignoreRow;
+    }
+    void setIgnoreFlag(bool ignore){
+        ignoreRow = ignore;
+    }
 
     string getColumn(int line, int colPos){
         if(line <= objSize && colPos <= colSize){
             return columns[line][colPos];
         }
+        return "";
     }
     string *getLine(int line){
         if(line <= objSize){

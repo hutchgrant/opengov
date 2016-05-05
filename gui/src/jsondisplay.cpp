@@ -37,6 +37,7 @@ void jsonDisplay::setView(int tab, QString data){
         ui->jsonView->clear();
         ui->jsonView->insertPlainText(data);
     }else{
+        ui->jsonView->clear();
         ui->csvView->insertPlainText(data);
     }
 }

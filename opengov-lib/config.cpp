@@ -88,8 +88,7 @@ void config::parseCfg(QString line, fileObj *obj){
     QString fourthCol = line.section(' ', 3, 3);
     if(firstCol == "name"){
         if(secCol.indexOf("\"")==0){
-            int blankCount = secCol.count(" ");
-            secCol = line.section(("\""), 1,1+blankCount);
+            secCol = line.section(("\""), 1,1);
         }
         obj->setName(secCol);
     }else if(firstCol == "url"){
@@ -97,12 +96,19 @@ void config::parseCfg(QString line, fileObj *obj){
     }else if(firstCol == "list"){
         obj->setListName(secCol);
     }else if(firstCol == "col"){
-        obj->setColPos(cfgColCount, secCol.toInt()-1);
-        obj->setColName(cfgColCount,thirdCol.toStdString());
-        if(fourthCol == "$COUNT"){
-            obj->setCountingColumn(cfgColCount, secCol.toInt()-1);
+        if(thirdCol == "$IGNORE"){
+            if(fourthCol.indexOf("\"")==0){
+                fourthCol = line.section(("\""), 1,1);
+            }
+            obj->setIgnoreRow(secCol.toInt()-1, fourthCol.toStdString());
+        }else{
+            obj->setColPos(cfgColCount, secCol.toInt()-1);
+            obj->setColName(cfgColCount,thirdCol.toStdString());
+            if(fourthCol == "$COUNT"){
+                obj->setCountingColumn(cfgColCount, secCol.toInt()-1);
+            }
+            cfgColCount++;
         }
-        cfgColCount++;
     }
 }
 /*

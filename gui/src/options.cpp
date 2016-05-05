@@ -37,7 +37,11 @@ void options::on_btnSearch_clicked()
  */
 void options::setResults(QString total, int resCount){
     ui->entryResults->setText(QString::number(resCount));
-    ui->fundingTotal->setText("$"+total);
+    if(!total.isEmpty()){
+        ui->fundingTotal->setText("$"+total);
+    }else{
+        ui->fundingLayout->hide();
+    }
 }
 
 /*

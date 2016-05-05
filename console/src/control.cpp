@@ -25,7 +25,7 @@
 control::control(QString jPath)
 {
     runCount = 0;
-    verboseOut = "verbose.txt";
+    verboseOut = "verbose.csv";
     jsonDefault = "data.json";
     cfgChoice = 0;
 
@@ -126,10 +126,10 @@ void control::printCfgList(){
     QString *cfg;
     cfg = new QString[cfgSize];
     cfg = parse.getCfgList();
-    cout<< "Index" << " | " << "Data Set"<<endl;
+    cout<< "\tIndex\t" << "|" << "\tData Set"<<endl;
     cout<<"---------------------------------" <<endl;
     for(int i=0; i<cfgSize; i++){
-       cout<< i << " | " << cfg[i].toStdString() << endl;
+       cout<< "\t"<< i << "\t|\t" << cfg[i].toStdString() << endl;
     }
 }
 

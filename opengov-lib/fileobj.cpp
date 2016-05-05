@@ -26,13 +26,8 @@
  */
 fileObj::fileObj()
 {
-    countColumn = 0;
-    countColumnPos = 0;
+
     total = 0;
-    qTotal = "";
-    dataURL = "";
-    dataName = "";
-    listName = "";
     objSize = 0;
     colSize = 0;
     initColNamePos(INITCOLSIZE);
@@ -57,6 +52,10 @@ fileObj::fileObj(const fileObj &src){
         colInitSize = src.colInitSize;
         countColumn = src.countColumn;
         countColumnPos = src.countColumnPos;
+        countColumnFlag = src.countColumnFlag;
+        ignoreColumn = src.ignoreColumn;
+        ignoreText = src.ignoreText;
+        ignoreRow = src.ignoreRow;
         dataURL = src.dataURL;
         dataName = src.dataName;
         listName = src.listName;
@@ -79,6 +78,16 @@ void fileObj::initFile(int initLineSz, int initColSz){
     colSize = 0;
     InitSize = 0;
     colInitSize = 0;
+    countColumn = 0;
+    countColumnPos = 0;
+    countColumnFlag = false;
+    ignoreColumn = 0;
+    ignoreText = "";
+    ignoreRow = false;
+    qTotal = "";
+    dataURL = "";
+    dataName = "";
+    listName = "";
     setInit(initLineSz, initColSz);
 }
 
@@ -165,23 +174,29 @@ QString fileObj::covertToJSON(int runCount){
     QString jTotal = "", qTitle = "", qOpen="";
     stringstream stream;
 
-    // format total
-    qTotal= QString::number(total);
-    qTotal = qTotal.insert(qTotal.length()-3, ",");
-    qTotal = qTotal.insert(qTotal.length()-7, ",");
-    if(qTotal.length() > 11){
-        qTotal = qTotal.insert(qTotal.length()-11, ",");
-    }
-    jTotal = "\""+ QString(colName[countColumnPos].c_str()) + "\":\"" + qTotal + "\", ";
-    qTotal.startsWith("$");
-
     qTitle = "\"query\":\""+title+"\", ";
     if(runCount == 0){
         qOpen = "{";
     }else{
         qOpen = ",{";
     }
-    stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
+
+    if(countColumnFlag){
+        // format total
+        qTotal= QString::number(total);
+        qTotal = qTotal.insert(qTotal.length()-3, ",");
+        qTotal = qTotal.insert(qTotal.length()-7, ",");
+        if(qTotal.length() > 11){
+            qTotal = qTotal.insert(qTotal.length()-11, ",");
+        }
+        jTotal = "\""+ QString(colName[countColumnPos].c_str()) + "\":\"" + qTotal + "\", ";
+        qTotal.startsWith("$");
+        stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
+    }else{
+        stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str()<< endl;
+    }
+
+
     stream <<  "\""+listName.toStdString()+"\":["<< endl;
 
     // format list data
@@ -224,6 +239,10 @@ fileObj& fileObj::operator=(const fileObj& src){
             colInitSize = src.colInitSize;
             countColumn = src.countColumn;
             countColumnPos = src.countColumnPos;
+            countColumnFlag = src.countColumnFlag;
+            ignoreColumn = src.ignoreColumn;
+            ignoreText = src.ignoreText;
+            ignoreRow = src.ignoreRow;
             dataURL = src.dataURL;
             dataName = src.dataName;
             listName = src.listName;
