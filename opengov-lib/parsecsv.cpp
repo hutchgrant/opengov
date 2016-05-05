@@ -282,7 +282,7 @@ void parseCSV::parse(QString line, int colSize){
                     cols[x].replace("\"", "");
                 }
                 // $COUNT column condition. if flagged, calculate total of all of these columns, format total and amounts
-                if(entry.getCountColumnFlag()){
+                if(entry.getCountColumnFlag() && x == entry.getCountColumnPos()){
                     cols[x].replace("$", "");
                     amtWComma = cols[x];
                     amtWComma.replace(",", "");

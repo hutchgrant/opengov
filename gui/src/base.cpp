@@ -40,7 +40,7 @@ base::base(QWidget *parent) :
 void base::init(){
     runCount = 0;
     search = "";
-    verboseOut = "verbose.txt";
+    verboseOut = "verbose.csv";
     jsonDefault = "data.json";
     cfgChoice = 0;
     parse.setPaths(verboseOut, jsonDefault);
