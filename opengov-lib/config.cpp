@@ -35,7 +35,7 @@ void config::initCfgList(){
     }
     cfgAmt = 0;
     cfgLineCount = 0;
-    cfgColCount = 0;
+    cfgRowCount = 0;
     cfgList = new QString[CFGSIZE];
     for(int i=0; i<CFGSIZE; i++){
         cfgList[i] = "";
@@ -58,11 +58,42 @@ bool config::readCfgList(){
 }
 
 /*
+ *  count config file
+ */
+bool config::readCfgUrl(int pos, fileObj *obj){
+    int rowCount = 0;
+    QFile file("./config/"+cfgList[pos]);
+    if(file.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&file);
+       while(!in.atEnd()){
+           QString line = in.readLine();
+           QString firstCol = line.section(' ', 0, 0);
+           QString secCol = line.section(' ', 1, 1);
+
+           if(secCol.indexOf("\"")==0){
+               secCol = line.section(("\""), 1,1);
+           }
+           if(firstCol == "name"){
+               obj->setName(secCol);
+           }else if(firstCol == "url"){
+               obj->setURL(secCol);
+           }
+           rowCount++;
+       }
+       file.close();
+       return true;
+    }
+    return false;
+
+}
+
+/*
  *  Parse config file
  */
 bool config::readCfg(int pos,fileObj *obj){
     cfgLineCount = 0;
-    cfgColCount = 0;
+    cfgRowCount = 0;
     QFile file("./config/"+cfgList[pos]);
     if(file.open(QIODevice::ReadOnly))
     {
@@ -96,22 +127,18 @@ void config::parseCfg(QString line, fileObj *obj){
         fourthCol = line.section(("\""), 1,1);
     }
 
-    if(firstCol == "name"){
-        obj->setName(secCol);
-    }else if(firstCol == "url"){
-        obj->setURL(secCol);
-    }else if(firstCol == "list"){
+    if(firstCol == "list"){
         obj->setListName(secCol);
     }else if(firstCol == "col"){
         if(thirdCol == "$IGNORE"){
             obj->setIgnoreRow(secCol.toInt()-1, fourthCol.toStdString());
         }else{
-            obj->setColPos(cfgColCount, secCol.toInt()-1);
-            obj->setColName(cfgColCount,thirdCol.toStdString());
+            obj->setColPos(cfgRowCount, secCol.toInt()-1);
+            obj->setColName(cfgRowCount,thirdCol.toStdString());
             if(fourthCol == "$COUNT"){
-                obj->setCountingColumn(cfgColCount, secCol.toInt()-1);
+                obj->setCountingColumn(cfgRowCount, secCol.toInt()-1);
             }
-            cfgColCount++;
+            cfgRowCount++;
         }
     }
 }

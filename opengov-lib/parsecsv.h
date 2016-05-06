@@ -51,7 +51,7 @@ public:
 
     parseCSV();
     virtual ~parseCSV();
-    void init(int rCount, string qry);
+    void init(int rCount, int colSz,string qry);
     void selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
@@ -61,7 +61,7 @@ public:
     int  readJsonFile();
     bool appendJson(QStringList row, QString data);
     bool writeFile();
-    void parse(QString line, int colSize);
+    void parse(QString line);
     void printFile();
     bool startProcess(QString bash);
     void setPaths(QString verb, QString jOut){

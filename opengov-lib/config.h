@@ -32,11 +32,12 @@ class config
 public:
     QString cfgPath;
     QString *cfgList;
-    int cfgAmt, cfgLineCount, cfgColCount;
+    int cfgAmt, cfgLineCount, cfgRowCount;
 
     config();
     void initCfgList();
     bool readCfgList();
+    bool readCfgUrl(int pos, fileObj *obj);
     bool readCfg(int pos, fileObj *obj);
     void parseCfg(QString line, fileObj *obj);
     virtual ~config();

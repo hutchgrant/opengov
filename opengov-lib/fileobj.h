@@ -73,12 +73,19 @@ public slots:
         }
         delete [] columns;
     }
+    void removeColNamePos(){
+        delete [] colName;
+        delete [] colPos;
+    }
+
     // re-initialize when array empty, without losing cfg changes
     void reInitNearEmpty(int row, int col){
         InitSize = 0;
         colInitSize = 0;
         removeColumnsArr(row);
         setInit(row,col);
+        removeColNamePos();
+        initColNamePos(col);
     }
 
     void setInit(int lines, int cols){
