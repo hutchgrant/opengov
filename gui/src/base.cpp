@@ -53,6 +53,7 @@ void base::addWidgets(){
    display = new jsonDisplay(this);
    opt = new options(this);
    expDg = new exportDialog(this);
+   detach = new detached();
 
    ui->jsondisplay_layout->addWidget(display, 0 ,0);
    ui->options_layout->addWidget(opt, 0 ,0);
@@ -96,6 +97,17 @@ bool base::extract(QString input){
 }
 
 /*
+ * Open html5 view
+ */
+void base::openWebView(){
+    detach->setOrientation(Html5ApplicationViewer::ScreenOrientationLockLandscape);
+    QSize screenSz = QSize(1024,570);
+    detach->showNormal();
+    detach->setMinimumSize(screenSz);
+    detach->loadFile("gui/res/html/index.html");
+}
+
+/*
  * Destructor
  */
 base::~base()
@@ -103,4 +115,11 @@ base::~base()
     delete ui;
     delete display;
     delete opt;
+    delete expDg;
+}
+
+
+void base::on_actionView_in_HTML_triggered()
+{
+    openWebView();
 }

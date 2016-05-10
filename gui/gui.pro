@@ -4,25 +4,29 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network widgets webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = opengov-gui
 TEMPLATE = app
 
+include(src/html5applicationviewer/html5applicationviewer.pri)
+qtcAddDeployment()
 
 SOURCES += src/main.cpp \
             src/jsondisplay.cpp \
     src/options.cpp \
     src/base.cpp \
-    src/exportdialog.cpp
+    src/exportdialog.cpp \
+    src/detached.cpp
 
 HEADERS  += \
             src/jsondisplay.h \
     src/options.h \
     src/base.h \
     src/exportdialog.h \
+    src/detached.h
 
 FORMS    += \
             src/jsondisplay.ui \
@@ -34,3 +38,6 @@ INCLUDEPATH += ../opengov-lib
 LIBS += -L../opengov-lib -lopengov-lib
 
 DESTDIR = ../
+
+RESOURCES += \
+    res/ogRes.qrc

@@ -25,7 +25,9 @@
 #include <src/options.h>
 #include <src/exportdialog.h>
 #include <parsecsv.h>
-
+#include <src/detached.h>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 namespace Ui {
 class base;
 }
@@ -47,6 +49,7 @@ public:
     void addConnections();
     void init();
     bool extract(QString input);
+    void openWebView();
     virtual ~base();
 
 private:
@@ -54,6 +57,7 @@ private:
     jsonDisplay * display;
     options *opt;
     exportDialog *expDg;
+    detached *detach;
 
 private slots:
     void getSearch(QString input){
@@ -84,6 +88,7 @@ private slots:
 
     void error(int errorCode){
     }
+    void on_actionView_in_HTML_triggered();
 };
 
 #endif // BASE_H

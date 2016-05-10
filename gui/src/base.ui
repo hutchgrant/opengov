@@ -41,6 +41,7 @@
      <string>File</string>
     </property>
     <addaction name="actionExport_JSON_Path"/>
+    <addaction name="actionView_in_HTML"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -48,6 +49,11 @@
   <action name="actionExport_JSON_Path">
    <property name="text">
     <string>Export JSON Path</string>
+   </property>
+  </action>
+  <action name="actionView_in_HTML">
+   <property name="text">
+    <string>View in HTML</string>
    </property>
   </action>
  </widget>
