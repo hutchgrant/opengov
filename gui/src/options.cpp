@@ -25,11 +25,12 @@ options::options(QWidget *parent) :
     ui(new Ui::options)
 {
     ui->setupUi(this);
+    appendDoc = true;
 }
 
 void options::on_btnSearch_clicked()
 {
-    emit btnSearchClick(ui->search->text());
+    emit btnSearchClick(ui->search->text(), appendDoc);
 }
 
 /*
@@ -61,4 +62,13 @@ options::~options()
 void options::on_cfgListBox_currentIndexChanged(int index)
 {
     emit cfgChoiceChange(index);
+}
+
+void options::on_checkBox_clicked()
+{
+    if(ui->checkBox->checkState()){
+        appendDoc = true;
+    }else{
+        appendDoc = false;
+    }
 }

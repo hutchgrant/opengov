@@ -66,7 +66,7 @@ public:
     virtual ~fileObj();
 public slots:
     void display();
-    QString covertToJSON(int runCount);
+    QString convertToJSON(int runCount, bool append);
     void removeColumnsArr(int size){
         for(int i=0; i<size; i++){
             delete [] columns[i];

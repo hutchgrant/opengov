@@ -41,21 +41,27 @@ void parseCSV::init(int rCount, int colSz, string qry){
     jData = "";
     verbData = "";
     errorFound = false;
+    appendDoc = true;
 }
 
 /*
  * Choose a cfg, read the cfg, initialize parse paths
  */
-void parseCSV::selectCfg(int choice){
+bool parseCSV::selectCfg(int choice){
     entry.initFile(INITSIZE,INITCOLSIZE);
     cfg.readCfgUrl(choice, &entry);  // need it to count columns pre-initialize
-
     csv = entry.getURL();
     csvPath = csv.mid(csv.lastIndexOf("/")+1, csv.size());
 
-    readColumns();
+    if(!readColumns()){
+        download();
+        if(!readColumns()){
+            return false; // 404
+        }
+    }
     entry.reInitNearEmpty(INITSIZE,colSize);
     cfg.readCfg(choice, &entry);
+    return true;
 }
 
 /*
@@ -161,42 +167,50 @@ bool parseCSV::readFile(){
 }
 
 /*
- *  Write formatted JSON data to text file
+ *  Organize formatted JSON data to text file
  */
 bool parseCSV::writeFile(){
     QString data = "";
-    data = entry.covertToJSON(runCount);
+    data = entry.convertToJSON(runCount, appendDoc);
 
     QFile file(jsonOut);
     if(file.exists() && runCount == 0){
+        // truncate on start regardless of settings
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
-            QTextStream stream(&file);
-            data.insert(0, "[");
-            stream << data << endl << "]";
-            file.close();
-            readJsonFile();
+            write(&file, data);
+            return true;
+        }
+    }else if(file.exists() && appendDoc){
+        // Append file
+        file.close();
+        if(fillJsonData(data)){
+            return true;
+        }
+    }else if(file.exists() && !appendDoc){
+        // Truncate anytime append not checked
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
+            write(&file, data);
             return true;
         }
     }else{
-        if (file.open(QIODevice::ReadWrite )&& runCount == 0) {
-            QTextStream stream(&file);
-            data.insert(0, "[");
-            stream << data << endl << "]";
-            file.close();
-            readJsonFile();
+        // default write
+        if (file.open(QIODevice::ReadWrite)) {
+            write(&file, data);
             return true;
-       }else{
-            if(file.exists() && runCount > 0){
-                file.close();
-                if(fillJsonData(data)){
-                    return true;
-                }
-            }
         }
-        emit error(9);
-        return false;
     }
     return true;
+}
+
+/*
+* write actual json file
+*/
+void parseCSV::write(QFile *file, QString data){
+    QTextStream stream(file);
+    data.insert(0, "[");
+    stream << data << endl << "]";
+    jData.append(data+"\n]");
+    file->close();
 }
 
 /*
@@ -261,8 +275,10 @@ bool parseCSV::appendJson(QStringList row, QString data){
     if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
         for(int i=0; i<row.size(); i++){
             stream << row[i] << endl;
+            jData.append(row[i]+"\n");
         }
         stream << data << endl << "]"<< endl;
+        jData.append(data+"\n]");
         file.close();
         return true;
     }else{

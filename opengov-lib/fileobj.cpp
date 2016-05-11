@@ -167,7 +167,7 @@ void fileObj::display(){
 /*
  * Covert to JSON
  */
-QString fileObj::covertToJSON(int runCount){
+QString fileObj::convertToJSON(int runCount, bool append){
     QString jTotal = "", qTitle = "", qOpen="";
     stringstream stream;
 
@@ -177,7 +177,7 @@ QString fileObj::covertToJSON(int runCount){
         qTitle = "";
     }
 
-    if(runCount == 0){
+    if(!append || runCount == 0){
         qOpen = "{";
     }else{
         qOpen = ",{";

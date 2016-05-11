@@ -69,7 +69,7 @@ void base::addWidgets(){
  */
 void base::addConnections(){
     connect(&parse,SIGNAL(error(int)), this, SLOT(error(int)));
-    connect(opt,SIGNAL(btnSearchClick(QString)), this, SLOT(getSearch(QString)));
+    connect(opt,SIGNAL(btnSearchClick(QString, bool)), this, SLOT(getSearch(QString, bool)));
     connect(ui->actionExport_JSON_Path, SIGNAL(triggered()), this, SLOT(showExport()));
     connect(expDg, SIGNAL(pathChanged(QString)), this, SLOT(resetJsonPath(QString)));
     connect(opt, SIGNAL(cfgChoiceChange(int)), this, SLOT(setCfgChoice(int)));
@@ -78,14 +78,13 @@ void base::addConnections(){
 /*
  *  Query grep, read verbose + parse, write json file
  */
-bool base::extract(QString input){
-    parse.selectCfg(cfgChoice);
-    if(parse.download()){
+bool base::extract(QString input, bool append){
+    if(parse.selectCfg(cfgChoice)){
         if(parse.query(runCount, input)){
+            parse.setAppend(append);
             if(parse.readFile()){
-                display->setView(1,parse.verbData);
                 if(parse.writeFile()){
-                    display->setView(0, parse.jData);
+                    display->setView(parse.jData,parse.verbData);
                     opt->setResults(parse.getQTotal(), parse.counter);
                     runCount++;
                     return true;

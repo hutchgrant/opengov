@@ -32,7 +32,7 @@ class jsonDisplay : public QWidget
 
 public:
     explicit jsonDisplay(QWidget *parent = 0);
-    void setView(int tab, QString data);
+    void setView(QString dataJson, QString dataCsv);
     void setExportPath(QString jPath, QString csvPath);
     virtual ~jsonDisplay();
 

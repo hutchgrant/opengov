@@ -38,13 +38,15 @@ public:
     void setCfgList(QString *list, int listSize);
 private:
     Ui::options *ui;
-    QString search;
+    bool appendDoc;
 private slots:
     void on_btnSearch_clicked();
     void on_cfgListBox_currentIndexChanged(int index);
 
+    void on_checkBox_clicked();
+
 signals:
-    void btnSearchClick(QString);
+    void btnSearchClick(QString, bool);
     void cfgChoiceChange(int);
 };
 

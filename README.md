@@ -17,7 +17,7 @@ Calculates the total of all financial data for each query(all ministries combine
 
 ```bash
 # Recommended with Qt5
-$ sudo apt-get install qt5-default
+$ sudo apt-get install qt5-default libqt5webkit5-dev
 ```
 This was built/tested in Ubuntu 14.04/16.04. Debian based distributions should be able to run without issue. 
 

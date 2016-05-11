@@ -48,11 +48,12 @@ public:
     QString jData;          // data read from json file
     QString verbData;       // data read from verbose csv file
     bool errorFound;        // Flag that an error was discovered
+    bool appendDoc;          // Flag that the document is to be cleared/amended
 
     parseCSV();
     virtual ~parseCSV();
     void init(int rCount, int colSz,string qry);
-    void selectCfg(int choice);
+    bool selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
     bool readColumns();
@@ -61,9 +62,14 @@ public:
     int  readJsonFile();
     bool appendJson(QStringList row, QString data);
     bool writeFile();
+    void write(QFile *file, QString data);
     void parse(QString line);
     void printFile();
     bool startProcess(QString bash);
+    void setAppend(bool append){
+        appendDoc = append;
+    }
+
     void setPaths(QString verb, QString jOut){
         verboseOut = verb;
         jsonOut = jOut;

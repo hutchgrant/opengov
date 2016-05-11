@@ -48,7 +48,7 @@ public:
     void addWidgets();
     void addConnections();
     void init();
-    bool extract(QString input);
+    bool extract(QString input, bool amend);
     void openWebView();
     virtual ~base();
 
@@ -60,9 +60,9 @@ private:
     detached *detach;
 
 private slots:
-    void getSearch(QString input){
+    void getSearch(QString input, bool amend){
          search = input;
-         extract(input);
+         extract(input, amend);
     }
     void showExport(){
         expDg->show();

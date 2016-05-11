@@ -31,15 +31,12 @@ jsonDisplay::jsonDisplay(QWidget *parent) :
 /*
  * Fill tabs with plain text data
  */
-void jsonDisplay::setView(int tab, QString data){
+void jsonDisplay::setView(QString dataJson, QString dataCsv){
 
-    if(tab == 0){
-        ui->jsonView->clear();
-        ui->jsonView->insertPlainText(data);
-    }else{
-        ui->jsonView->clear();
-        ui->csvView->insertPlainText(data);
-    }
+    ui->jsonView->clear();
+    ui->jsonView->insertPlainText(dataJson);
+    ui->csvView->clear();
+    ui->csvView->insertPlainText(dataCsv);
 }
 
 /*
