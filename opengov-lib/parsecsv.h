@@ -58,11 +58,7 @@ public:
     bool query(int count, QString qSearch);
     bool readColumns();
     bool readFile();
-    bool fillJsonData(QString data);
-    int  readJsonFile();
-    bool appendJson(QStringList row, QString data);
     bool writeFile();
-    void write(QFile *file, QString data);
     void parse(QString line);
     void printFile();
     bool startProcess(QString bash);

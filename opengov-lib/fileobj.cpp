@@ -195,11 +195,10 @@ QString fileObj::convertToJSON(int runCount, bool append){
         }
         jTotal = "\""+ QString(colName[countColumnPos].c_str()) + "\":\"" + qTotal + "\", ";
         qTotal.startsWith("$");
-        stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
     }else{
-        stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str()<< endl;
+        jTotal = "";
     }
-
+    stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
 
     stream <<  "\""+listName.toStdString()+"\":["<< endl;
 
@@ -207,10 +206,9 @@ QString fileObj::convertToJSON(int runCount, bool append){
     for(int i=0; i< objSize; i++){
         stream << "{";
         for(int x=0; x< colSize; x++){
-            if(x == colSize-1){
-                stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\"";
-            }else{
-                stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\", ";
+            stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\"";
+            if(x < colSize-1){
+                stream << ", ";
             }
         }
         if(i == objSize-1){

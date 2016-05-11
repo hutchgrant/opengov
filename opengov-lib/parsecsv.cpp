@@ -26,6 +26,8 @@ parseCSV::parseCSV()
 {
     init(0, 0, "");
     readCfg();
+    jData = "";
+    verbData = "";
 }
 
 /*
@@ -38,8 +40,6 @@ void parseCSV::init(int rCount, int colSz, string qry){
     search = qry;
     total = 0;
     qTotal = "";
-    jData = "";
-    verbData = "";
     errorFound = false;
     appendDoc = true;
 }
@@ -49,15 +49,13 @@ void parseCSV::init(int rCount, int colSz, string qry){
  */
 bool parseCSV::selectCfg(int choice){
     entry.initFile(INITSIZE,INITCOLSIZE);
-    cfg.readCfgUrl(choice, &entry);  // need it to count columns pre-initialize
+    cfg.readCfgUrl(choice, &entry);
     csv = entry.getURL();
     csvPath = csv.mid(csv.lastIndexOf("/")+1, csv.size());
-
-    if(!readColumns()){
-        download();
-        if(!readColumns()){
-            return false; // 404
-        }
+    if(download()){
+        readColumns();
+    }else{
+        return false;
     }
     entry.reInitNearEmpty(INITSIZE,colSize);
     cfg.readCfg(choice, &entry);
@@ -135,15 +133,19 @@ bool parseCSV::readColumns(){
  * read text file for grep'd data, send to parser
  */
 bool parseCSV::readFile(){
-    verbData = "";
     QString line = "";
-    QFile inputFile(verboseOut);
     bool colDefaultLine = false;
+
+    if(!appendDoc || runCount == 0){
+        verbData = "";
+        jData = "";
+    }else{
+        verbData.append("\n");
+    }
+
+    QFile inputFile(verboseOut);
     if(inputFile.open(QIODevice::ReadOnly))
     {
-       if(runCount != 0){
-           verbData.insert(0, "\n");
-       }
        QTextStream in(&inputFile);
        while (!in.atEnd())
        {
@@ -174,115 +176,17 @@ bool parseCSV::writeFile(){
     data = entry.convertToJSON(runCount, appendDoc);
 
     QFile file(jsonOut);
-    if(file.exists() && runCount == 0){
-        // truncate on start regardless of settings
-        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
-            write(&file, data);
-            return true;
-        }
-    }else if(file.exists() && appendDoc){
-        // Append file
-        file.close();
-        if(fillJsonData(data)){
-            return true;
-        }
-    }else if(file.exists() && !appendDoc){
-        // Truncate anytime append not checked
-        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
-            write(&file, data);
-            return true;
-        }
-    }else{
-        // default write
-        if (file.open(QIODevice::ReadWrite)) {
-            write(&file, data);
-            return true;
-        }
-    }
-    return true;
-}
-
-/*
-* write actual json file
-*/
-void parseCSV::write(QFile *file, QString data){
-    QTextStream stream(file);
-    data.insert(0, "[");
-    stream << data << endl << "]";
-    jData.append(data+"\n]");
-    file->close();
-}
-
-/*
- * Fill previously written json data
- */
-bool parseCSV::fillJsonData(QString data){
-    int streamSize = readJsonFile();
-    QFile file(jsonOut);
-    if (file.open(QIODevice::ReadWrite )) {
+    if(file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
         QTextStream stream(&file);
-        QStringList row;
-        int count = 0;
-        bool end = false;
-
-        while (!stream.atEnd() && !end)
-        {
-            if(count == streamSize-1){
-                row.append("");
-                count++;
-                end = true;
-            }else if(count < streamSize-1){
-                row.append(stream.readLine().toStdString().c_str());
-                count++;
-            }
+        if(!appendDoc || runCount == 0){
+             jData.append("["+data+"\n]");
+        }else{
+            jData.chop(1);
+            jData.append("\n"+data+"\n]");
         }
-        file.close();
-        if(appendJson(row, data)){
-            readJsonFile();
-            return true;
-        }
-    }
-    return false;
-}
-
-/*
- *  Read JsonFile, count lines, fill global jsonData string
- */
-int parseCSV::readJsonFile(){
-    int count = 0;
-    jData = "";
-    QFile file(jsonOut);
-    if(file.open(QIODevice::ReadOnly))
-    {
-       QTextStream stream(&file);
-       while (!stream.atEnd())
-       {
-          jData.append(stream.readLine().toStdString().c_str()).append("\n");
-          count++;
-       }
-       file.close();
-       return count;
-    }
-    return 0;
-}
-
-/*
- * append previous json file to a new json file (with ] removed )
- */
-bool parseCSV::appendJson(QStringList row, QString data){
-    QFile file(jsonOut);
-    QTextStream stream(&file);
-    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
-        for(int i=0; i<row.size(); i++){
-            stream << row[i] << endl;
-            jData.append(row[i]+"\n");
-        }
-        stream << data << endl << "]"<< endl;
-        jData.append(data+"\n]");
+        stream << jData <<endl;
         file.close();
         return true;
-    }else{
-        return false;
     }
 }
 
