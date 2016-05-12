@@ -20,11 +20,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define CFGSIZE 10
 #include <QString>
 #include <QDir>
 #include <QDirIterator>
 #include <fileobj.h>
+#include <cfgobj.h>
 
 using namespace std;
 class config
@@ -32,14 +32,14 @@ class config
 public:
     QString cfgPath;
     QString *cfgList;
-    int cfgAmt, cfgLineCount, cfgRowCount;
+    int cfgAmt, cfgRowCount;
 
     config();
     void initCfgList();
     bool readCfgList();
-    bool readCfgUrl(int pos, fileObj *obj);
-    bool readCfg(int pos, fileObj *obj);
-    void parseCfg(QString line, fileObj *obj);
+    bool readCfgUrl(int pos, cfgObj *obj);
+    bool readCfg(int pos, cfgObj *obj);
+    void parseCfg(QString line, cfgObj *obj);
     virtual ~config();
 
     QString *getCfgList(){

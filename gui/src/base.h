@@ -54,7 +54,7 @@ public:
 
 private:
     Ui::base *ui;
-    jsonDisplay * display;
+    jsonDisplay *display;
     options *opt;
     exportDialog *expDg;
     detached *detach;

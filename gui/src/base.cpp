@@ -59,9 +59,9 @@ void base::addWidgets(){
    ui->options_layout->addWidget(opt, 0 ,0);
    ui->menubar->show();
 
-    resetJsonPath(jsonDefault);
+   resetJsonPath(jsonDefault);
 
-    opt->setCfgList(parse.getCfgList(), parse.getCfgListSize());
+   opt->setCfgList(parse.getCfgList(), parse.getCfgListSize());
 }
 
 /*
@@ -79,10 +79,10 @@ void base::addConnections(){
  *  Query grep, read verbose + parse, write json file
  */
 bool base::extract(QString input, bool append){
-    if(parse.selectCfg(cfgChoice)){
+     if(parse.selectCfg(cfgChoice)){
         if(parse.query(runCount, input)){
             parse.setAppend(append);
-            if(parse.readFile()){
+           if(parse.readFile()){
                 if(parse.writeFile()){
                     display->setView(parse.jData,parse.verbData);
                     opt->setResults(parse.getQTotal(), parse.counter);
@@ -115,6 +115,7 @@ base::~base()
     delete display;
     delete opt;
     delete expDg;
+    delete detach;
 }
 
 

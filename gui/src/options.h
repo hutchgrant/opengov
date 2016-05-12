@@ -34,15 +34,14 @@ class options : public QWidget
 public:
     explicit options(QWidget *parent = 0);
     void setResults(QString total, int resCount);
-    virtual ~options();
     void setCfgList(QString *list, int listSize);
+    virtual ~options();
 private:
     Ui::options *ui;
     bool appendDoc;
 private slots:
     void on_btnSearch_clicked();
     void on_cfgListBox_currentIndexChanged(int index);
-
     void on_checkBox_clicked();
 
 signals:

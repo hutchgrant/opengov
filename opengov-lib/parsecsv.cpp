@@ -24,8 +24,8 @@
  */
 parseCSV::parseCSV()
 {
-    init(0, 0, "");
-    readCfg();
+    init(0, "");
+    cfg.readCfgList();
     jData = "";
     verbData = "";
 }
@@ -33,9 +33,8 @@ parseCSV::parseCSV()
 /*
  * (re)Initialize globals
  */
-void parseCSV::init(int rCount, int colSz, string qry){
+void parseCSV::init(int rCount, string qry){
     counter = 0;
-    colSize = colSz;
     runCount = rCount;
     search = qry;
     total = 0;
@@ -48,17 +47,13 @@ void parseCSV::init(int rCount, int colSz, string qry){
  * Choose a cfg, read the cfg, initialize parse paths
  */
 bool parseCSV::selectCfg(int choice){
-    entry.initFile(INITSIZE,INITCOLSIZE);
-    cfg.readCfgUrl(choice, &entry);
-    csv = entry.getURL();
+    cfg.readCfg(choice, &cObj);
+    csv = cObj.getURL();
     csvPath = csv.mid(csv.lastIndexOf("/")+1, csv.size());
-    if(download()){
-        readColumns();
-    }else{
+    if(!download()){
         return false;
     }
-    entry.reInitNearEmpty(INITSIZE,colSize);
-    cfg.readCfg(choice, &entry);
+    entry.reInitCols(10,cObj.getColSize());
     return true;
 }
 
@@ -81,7 +76,7 @@ bool parseCSV::download(){
 bool parseCSV::query(int count, QString qSearch){
     QString qFind = "";
 
-    init(count, colSize, qSearch.toStdString());
+    init(count, qSearch.toStdString());
     qFind = "bash -c \"grep -i -a '"+ qSearch +"' "+ csvPath +" > " + verboseOut + "\"";
 
     if(QFile(csvPath).exists()){
@@ -94,48 +89,11 @@ bool parseCSV::query(int count, QString qSearch){
 }
 
 /*
- *  Count the columns in the CSV first row, for initializing fileObj with colSize
- */
-bool parseCSV::readColumns(){
-    int approxSize = 0;
-    int totalCount = 0;
-    QString row = "", col = "";
-    QFile file(csvPath);
-    if(file.open(QIODevice::ReadOnly))
-    {
-        QTextStream in(&file);
-        row = in.readLine();
-        approxSize = row.count(",");
-        for(int i=0; i<=approxSize; i++){
-            col = row.section(",",i,i);
-            if(col.indexOf("\"") == 0){
-                int count = 1;
-                while(!col.endsWith("\"")){
-                    col = row.section(",",i,i+count);
-                    count++;
-                }
-                i+= count;
-                totalCount += count;
-            }else{
-                totalCount++;
-            }
-        }
-        colSize = totalCount;
-        file.close();
-        return true;
-    }else{
-        emit error(8);
-        return false;
-    }
-}
-
-/*
  * read text file for grep'd data, send to parser
  */
 bool parseCSV::readFile(){
     QString line = "";
     bool colDefaultLine = false;
-
     if(!appendDoc || runCount == 0){
         verbData = "";
         jData = "";
@@ -173,7 +131,7 @@ bool parseCSV::readFile(){
  */
 bool parseCSV::writeFile(){
     QString data = "";
-    data = entry.convertToJSON(runCount, appendDoc);
+    data = entry.convertToJSON(runCount, appendDoc, &cObj);
 
     QFile file(jsonOut);
     if(file.open(QIODevice::ReadWrite | QIODevice::Truncate )) {
@@ -188,6 +146,7 @@ bool parseCSV::writeFile(){
         file.close();
         return true;
     }
+    return false;
 }
 
 /*
@@ -201,8 +160,8 @@ void parseCSV::parse(QString line){
     QString amtWComma = "",  column = "";
     QString *cols;
     int approxSize = line.count(",");
-    cols = new QString[colSize];
-    for(int i=0; i<colSize; i++){
+    cols = new QString[cObj.colSize];
+    for(int i=0; i<cObj.colSize; i++){
         cols[i] = "";
     }
     for(int i=0; i<approxSize; i++){
@@ -222,11 +181,11 @@ void parseCSV::parse(QString line){
                 skipFlag = true;
             }
         }
-        if(i==entry.getColPos(x)+originalSkip){
+        if(i==cObj.getColPos(x)+originalSkip){
             cols[x] = line.section(",",i,i);
             // ignoreFlag Column condition
-            if(entry.getIgnoreText() == cols[x].toStdString().c_str()){
-                if( entry.getIgnoreRow() && entry.getIgnoreColumn() == entry.getColPos(x)+originalSkip){
+            if(cObj.getIgnoreText() == cols[x].toStdString().c_str()){
+                if( cObj.getIgnoreRow() && cObj.getIgnoreColumn() == cObj.getColPos(x)+originalSkip){
                     ignoreFlag = true;
                 }
             }else{
@@ -242,7 +201,7 @@ void parseCSV::parse(QString line){
                     cols[x].replace("\"", "");
                 }
                 // $COUNT column condition. if flagged, calculate total of all of these columns, format total and amounts
-                if(entry.getCountColumnFlag() && x == entry.getCountColumnPos() && !ignoreFlag){
+                if(cObj.getCountColumnFlag() && x == cObj.getCountColumnPos() && !ignoreFlag){
                     cols[x].replace("$", "");
                     amtWComma = cols[x];
                     amtWComma.replace(",", "");
@@ -260,7 +219,6 @@ void parseCSV::parse(QString line){
         entry.setLine(counter, x, cols);
         counter++;
     }
-    delete [] cols;
 }
 
 /*
@@ -274,6 +232,7 @@ bool parseCSV::startProcess(QString bash){
     process->start(bash);
     process->waitForFinished();
     process->close();
+    delete process;
     if(errorFound){
         return false;
     }

@@ -71,4 +71,5 @@ void detached::closeEvent(QCloseEvent *event){
  * Destructor
  */
 detached::~detached(){
+
 }

@@ -16,7 +16,7 @@ class exportDialog : public QDialog
 public:
     QString jsonPath;
     explicit exportDialog(QWidget *parent = 0);
-    ~exportDialog();
+    virtual ~exportDialog();
 
 private slots:
     void on_browsePath_clicked();

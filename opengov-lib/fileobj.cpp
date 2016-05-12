@@ -30,8 +30,7 @@ fileObj::fileObj()
     total = 0;
     objSize = 0;
     colSize = 0;
-    initColNamePos(INITCOLSIZE);
-    initFile(INITSIZE, INITCOLSIZE);
+    initFile(3, 10);
 }
 
 /*
@@ -44,21 +43,8 @@ fileObj::fileObj(const fileObj &src){
         for(int i=0; i< src.objSize; i++){
             setLine(i,src.colSize,src.columns[i]);
         }
-        for(int i=0; i< src.colSize; i++){
-            setColName(i, src.colName[i]);
-            setColPos(i, src.colPos[i]);
-        }
         InitSize = src.InitSize;
         colInitSize = src.colInitSize;
-        countColumn = src.countColumn;
-        countColumnPos = src.countColumnPos;
-        countColumnFlag = src.countColumnFlag;
-        ignoreColumn = src.ignoreColumn;
-        ignoreText = src.ignoreText;
-        ignoreRow = src.ignoreRow;
-        dataURL = src.dataURL;
-        dataName = src.dataName;
-        listName = src.listName;
         total = src.total;
         qTotal = src.qTotal;
     }
@@ -69,22 +55,13 @@ fileObj::fileObj(const fileObj &src){
  */
 void fileObj::initFile(int initLineSz, int initColSz){
     if(objSize > 0){
-        removeColumnsArr(objSize);
+        delete columns;
     }
     objSize = 0;
     colSize = 0;
     InitSize = 0;
     colInitSize = 0;
-    countColumn = 0;
-    countColumnPos = 0;
-    countColumnFlag = false;
-    ignoreColumn = 0;
-    ignoreText = "";
-    ignoreRow = false;
     qTotal = "";
-    dataURL = "";
-    dataName = "";
-    listName = "";
     setInit(initLineSz, initColSz);
 }
 
@@ -96,10 +73,10 @@ void fileObj::REinitFile(int newsize){
     int oldColInitSize = colInitSize;
 
     string **colCopy;
-    colCopy = new string*[InitSize+newsize];
-    for(int i=0; i<InitSize+newsize; i++){
-        colCopy[i] = new string[colInitSize];
-        for(int x=0; x<colInitSize; x++){
+    colCopy = new string*[objSize];
+    for(int i=0; i<objSize; i++){
+        colCopy[i] = new string[colSize];
+        for(int x=0; x<colSize; x++){
             colCopy[i][x] = "-";
         }
     }
@@ -109,55 +86,36 @@ void fileObj::REinitFile(int newsize){
         }
     }
 
-    for(int i=0; i<objSize; i++){
-        delete [] columns[i];
-    }
-    delete [] columns;
-
+    delete columns;
     InitSize = 0;
     colInitSize = 0;
     setInit(oldInitSize+newsize, oldColInitSize);
 
-    for(int i =0; i<oldInitSize; i++){
-        for(int x=0; x<colInitSize; x++){
+    for(int i =0; i<objSize; i++){
+        for(int x=0; x<colSize; x++){
             columns[i][x] = colCopy[i][x];
         }
     }
 
-    for(int i=0; i<oldInitSize; i++){
-        delete [] colCopy[i];
-    }
-    delete [] colCopy;
+    delete colCopy;
 }
 
 /*
  *  Destructor
  */
 fileObj::~fileObj(){
-    for(int i=0; i<objSize; i++){
-        delete [] columns[i];
-    }
-    delete [] columns;
-    delete [] colName;
-    delete [] colPos;
+    delete columns;
 }
 
 /*
  *  Display all var
  */
 void fileObj::display(){
-    cout << "dataName: "<<dataName.toStdString() << endl;
-    cout << "listName: "<< listName.toStdString() <<endl;
     cout << "colSize: " << colSize << endl;
     cout << "objSize: " << objSize << endl;
-    cout << "column names: "<<endl;
-    for(int i=0; i<colSize; i++){
-        cout << i << " colPos " << colPos[i] << " colName: " <<colName[i] << endl;
-    }
     for(int i=0; i< objSize; i++){
         cout << " line: " << i;
         for(int x=0; x<colSize; x++){
-            cout << " column: " << colName[x] << " ";
             cout << columns[i][x];
         }
         cout << endl;
@@ -167,10 +125,9 @@ void fileObj::display(){
 /*
  * Covert to JSON
  */
-QString fileObj::convertToJSON(int runCount, bool append){
+QString fileObj::convertToJSON(int runCount, bool append, cfgObj *cObj){
     QString jTotal = "", qTitle = "", qOpen="";
     stringstream stream;
-
     if(!title.isEmpty()){
         qTitle = "\"query\":\""+title+"\", ";
     }else{
@@ -183,7 +140,7 @@ QString fileObj::convertToJSON(int runCount, bool append){
         qOpen = ",{";
     }
 
-    if(countColumnFlag){
+    if(cObj->getCountColumnFlag()){
         // format total
         qTotal= QString::number(total);
         qTotal = qTotal.insert(qTotal.length()-3, ",");
@@ -193,20 +150,18 @@ QString fileObj::convertToJSON(int runCount, bool append){
         if(qTotal.length() > 11){
             qTotal = qTotal.insert(qTotal.length()-11, ",");
         }
-        jTotal = "\""+ QString(colName[countColumnPos].c_str()) + "\":\"" + qTotal + "\", ";
+        jTotal = "\""+ QString(cObj->getColName(cObj->getCountColumnPos()).c_str()) + "\":\"" + qTotal + "\", ";
         qTotal.startsWith("$");
     }else{
         jTotal = "";
     }
     stream << qOpen.toStdString().c_str() << qTitle.toStdString().c_str() <<  jTotal.toStdString().c_str()<< endl;
-
-    stream <<  "\""+listName.toStdString()+"\":["<< endl;
-
+    stream <<  "\""+cObj->getListName().toStdString()+"\":["<< endl;
     // format list data
     for(int i=0; i< objSize; i++){
         stream << "{";
         for(int x=0; x< colSize; x++){
-            stream << "\""+colName[x]+"\"" +":\""+columns[i][x]+"\"";
+            stream << "\""+cObj->getColName(x)+"\"" +":\""+columns[i][x]+"\"";
             if(x < colSize-1){
                 stream << ", ";
             }
@@ -233,21 +188,8 @@ fileObj& fileObj::operator=(const fileObj& src){
             for(int i=0; i< src.objSize; i++){
                 setLine(i,src.colSize,src.columns[i]);
             }
-            for(int i=0; i< src.colSize; i++){
-                setColName(i, src.colName[i]);
-                setColPos(i, src.colPos[i]);
-            }
             InitSize = src.InitSize;
             colInitSize = src.colInitSize;
-            countColumn = src.countColumn;
-            countColumnPos = src.countColumnPos;
-            countColumnFlag = src.countColumnFlag;
-            ignoreColumn = src.ignoreColumn;
-            ignoreText = src.ignoreText;
-            ignoreRow = src.ignoreRow;
-            dataURL = src.dataURL;
-            dataName = src.dataName;
-            listName = src.listName;
             total = src.total;
             qTotal = src.qTotal;
         }

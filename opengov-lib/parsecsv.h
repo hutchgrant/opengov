@@ -28,6 +28,7 @@
 #include <iostream>
 #include <cstring>
 #include <fileobj.h>
+#include <cfgobj.h>
 #include <config.h>
 
 using namespace std;
@@ -37,7 +38,6 @@ class parseCSV : public QObject
 public:
     int counter;            // Parse Line Counter
     int runCount;           // Overall Count of times run
-    int colSize;            // Total default columns in first row
     long total;             // Total of $COUNT column
     QString qTotal;         // formatted total of $COUNT column
     string search;          // search query
@@ -52,7 +52,7 @@ public:
 
     parseCSV();
     virtual ~parseCSV();
-    void init(int rCount, int colSz,string qry);
+    void init(int rCount, string qry);
     bool selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
@@ -70,19 +70,16 @@ public:
         verboseOut = verb;
         jsonOut = jOut;
     }
-    void readCfg(){
-        cfg.readCfgList();
-    }
 
     QString *getCfgList(){
         return cfg.getCfgList();
     }
-    int getCfgListSize(){
-        return cfg.getCfgListSize();
+    QString getDataName(){
+        return cObj.getName();
     }
 
-    QString getDataName(){
-        return entry.getName();
+    int getCfgListSize(){
+        return cfg.getCfgListSize();
     }
     QString getQTotal(){
         return entry.getQTotal();
@@ -105,10 +102,11 @@ public slots:
     }
 signals:
     void error(int);
-
+    void listFound(QString *, int);
 private:
     fileObj entry;
     config cfg;
     QProcess *process;
+    cfgObj cObj;
 };
 #endif // PARSECSV_H

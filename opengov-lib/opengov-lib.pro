@@ -9,8 +9,10 @@ CONFIG += staticlib
 
 SOURCES += fileobj.cpp \
             parsecsv.cpp \
-            config.cpp
+            config.cpp \
+            cfgobj.cpp
 
 HEADERS += fileobj.h \
             parsecsv.h \
-            config.h
+            config.h \
+            cfgobj.h

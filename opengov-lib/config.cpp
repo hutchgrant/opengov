@@ -21,7 +21,6 @@
 
 config::config()
 {
-    cfgPath = "config";
     cfgAmt = 0;
     initCfgList();
 }
@@ -31,14 +30,13 @@ config::config()
  */
 void config::initCfgList(){
     if(cfgAmt > 0){
-        delete [] cfgList;
+        delete cfgList;
     }
-    cfgAmt = 0;
-    cfgLineCount = 0;
+    cfgPath = "config";
     cfgRowCount = 0;
-    cfgList = new QString[CFGSIZE];
-    for(int i=0; i<CFGSIZE; i++){
-        cfgList[i] = "";
+    cfgList = new QString[10];
+    for(int i=0; i<10; i++){
+        cfgList[i] = "-";
     }
 }
 
@@ -46,7 +44,7 @@ void config::initCfgList(){
  *  Read and list all cfg files in config directory
  */
 bool config::readCfgList(){
-    cfgPath = QDir::currentPath() + "/config/";  // get chosen path
+    cfgPath = QDir::currentPath() + "/config/";
     QDirIterator directories(cfgPath,  QDir::Files);
 
     while(directories.hasNext()){
@@ -60,7 +58,7 @@ bool config::readCfgList(){
 /*
  *  count config file
  */
-bool config::readCfgUrl(int pos, fileObj *obj){
+bool config::readCfgUrl(int pos, cfgObj *obj){
     int rowCount = 0;
     QFile file("./config/"+cfgList[pos]);
     if(file.open(QIODevice::ReadOnly))
@@ -91,9 +89,9 @@ bool config::readCfgUrl(int pos, fileObj *obj){
 /*
  *  Parse config file
  */
-bool config::readCfg(int pos,fileObj *obj){
-    cfgLineCount = 0;
+bool config::readCfg(int pos,cfgObj *obj){
     cfgRowCount = 0;
+    obj->initFile(10);
     QFile file("./config/"+cfgList[pos]);
     if(file.open(QIODevice::ReadOnly))
     {
@@ -101,7 +99,6 @@ bool config::readCfg(int pos,fileObj *obj){
        while (!in.atEnd())
        {
             parseCfg(in.readLine(), obj);
-            cfgLineCount++;
        }
        file.close();
        return true;
@@ -112,7 +109,7 @@ bool config::readCfg(int pos,fileObj *obj){
 /*
  *  Parse config file
  */
-void config::parseCfg(QString line, fileObj *obj){
+void config::parseCfg(QString line, cfgObj *obj){
     QString firstCol = line.section(' ', 0, 0);
     QString secCol = line.section(' ', 1, 1);
     QString thirdCol = line.section(' ', 2, 2);
@@ -127,24 +124,27 @@ void config::parseCfg(QString line, fileObj *obj){
         fourthCol = line.section(("\""), 1,1);
     }
 
+
     if(firstCol == "list"){
         obj->setListName(secCol);
     }else if(firstCol == "col"){
         if(thirdCol == "$IGNORE"){
             obj->setIgnoreRow(secCol.toInt()-1, fourthCol.toStdString());
         }else{
-            obj->setColPos(cfgRowCount, secCol.toInt()-1);
-            obj->setColName(cfgRowCount,thirdCol.toStdString());
+            obj->setColNamePos(cfgRowCount, thirdCol.toStdString(), secCol.toInt()-1);
             if(fourthCol == "$COUNT"){
                 obj->setCountingColumn(cfgRowCount, secCol.toInt()-1);
             }
             cfgRowCount++;
         }
+    }else if(firstCol == "name"){
+        obj->setName(secCol);
+    }else if(firstCol == "url"){
+        obj->setURL(secCol);
     }
 }
 /*
  *  destructor
  */
 config::~config(){
-    delete [] cfgList;
 }
