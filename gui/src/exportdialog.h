@@ -19,6 +19,7 @@ public:
     int dialogMode;
     explicit exportDialog(QWidget *parent = 0);
     void showError(int errorCode);
+    void showDownload(QString);
     void showBrowse();
     virtual ~exportDialog();
 private slots:

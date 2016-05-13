@@ -38,7 +38,7 @@ class parseCSV : public QObject
 public:
     int counter;            // Parse Line Counter
     int runCount;           // Overall Count of times run
-    long total;             // Total of $COUNT column
+    float total;             // Total of $COUNT column
     QString qTotal;         // formatted total of $COUNT column
     string search;          // search query
     QString csv;            // csv data url
@@ -101,6 +101,8 @@ public slots:
     }
 signals:
     void error(int);
+    void downloadStarted(QString,bool,bool);
+    void downloadFinished(QString,bool,bool);
 private:
     fileObj entry;
     config cfg;

@@ -39,7 +39,7 @@ void exportDialog::showBrowse(){
  */
 void exportDialog::showError(int errorCode){
     QString errorMsg = "";
-    dialogMode = 1;
+    dialogMode = 2;
 
     ui->browsePath->hide();
     ui->absoluteJPath->hide();

@@ -86,12 +86,11 @@ public slots:
         colSize++;
     }
     void setColNamePos(int index, string name, int pos){
-        if(colSize < colInitSize){
-            setColName(index,  name);
-            setColPos(index, pos);
-        }else{
+        if(colSize >= colInitSize-1){
             REinitFile(colInitSize+10);
         }
+        setColName(index,  name);
+        setColPos(index, pos);
     }
 
     int getColPos(int col){

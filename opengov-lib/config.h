@@ -32,14 +32,22 @@ class config
 public:
     QString cfgPath;
     QString *cfgList;
-    int cfgAmt, cfgRowCount;
+    int cfgAmt, cfgRowCount, initSize;
 
     config();
     void initCfgList();
+    void reInitCfgList(int newsize);
     bool readCfgList();
     bool readCfg(int pos, cfgObj *obj);
     void parseCfg(QString line, cfgObj *obj);
     virtual ~config();
+    void setCfg(QString path){
+        if(cfgAmt >= initSize-1){
+            reInitCfgList(cfgAmt+10);
+        }
+        cfgList[cfgAmt] = path;
+        cfgAmt++;
+    }
 
     QString *getCfgList(){
         return cfgList;

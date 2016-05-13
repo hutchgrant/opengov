@@ -94,6 +94,7 @@ private slots:
     void on_actionView_in_HTML_triggered(){
         openWebView();
     }
+    void setStatusBar(QString name, bool query, bool finished);
 };
 
 #endif // BASE_H

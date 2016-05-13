@@ -62,10 +62,12 @@ bool parseCSV::selectCfg(int choice){
  */
 bool parseCSV::download(){
     if(!QFile(csvPath).exists()){
+        emit downloadStarted(cObj.getName(), false, false);
         if(!startProcess("wget "+csv)){
             emit error(6);
             return false;
         }
+        emit downloadFinished(cObj.getName(), false, false);
     }
     return true;
 }
@@ -205,7 +207,7 @@ void parseCSV::parse(QString line){
                     cols[x].replace("$", "");
                     amtWComma = cols[x];
                     amtWComma.replace(",", "");
-                    total += amtWComma.toLong();
+                    total += amtWComma.toFloat();
                 }
             }
             x++;

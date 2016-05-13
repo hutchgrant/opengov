@@ -34,9 +34,33 @@ void config::initCfgList(){
     }
     cfgPath = "config";
     cfgRowCount = 0;
-    cfgList = new QString[10];
-    for(int i=0; i<10; i++){
+    initSize = 10;
+    cfgList = new QString[initSize];
+    for(int i=0; i<initSize; i++){
         cfgList[i] = "-";
+    }
+}
+
+/*
+ * reinit cfgList
+ */
+void config::reInitCfgList(int newsize){
+    QString *copyList = new QString[cfgAmt];
+    for(int i=0; i<cfgAmt; i++){
+        copyList[i] = "-";
+    }
+
+    for(int i=0; i<cfgAmt; i++){
+        copyList[i] = cfgList[i];
+    }
+
+    cfgList = new QString[newsize];
+    for(int i=0; i<newsize; i++){
+          cfgList[i] = "-";
+    }
+    initSize = newsize;
+    for(int i=0; i<cfgAmt; i++){
+        cfgList[i] = copyList[i];
     }
 }
 
@@ -49,8 +73,7 @@ bool config::readCfgList(){
 
     while(directories.hasNext()){
         directories.next();
-        cfgList[cfgAmt] = directories.fileName();
-        cfgAmt++;
+        setCfg(directories.fileName());
     }
     return true;
 }

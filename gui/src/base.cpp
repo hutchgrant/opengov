@@ -69,6 +69,9 @@ void base::addWidgets(){
  */
 void base::addConnections(){
     connect(&parse,SIGNAL(error(int)), this, SLOT(error(int)));
+    connect(&parse,SIGNAL(downloadStarted(QString, bool, bool)), this, SLOT(setStatusBar(QString, bool, bool)));
+    connect(&parse,SIGNAL(downloadFinished(QString, bool, bool)), this, SLOT(setStatusBar(QString, bool, bool)));
+
     connect(opt,SIGNAL(btnSearchClick(QString, bool)), this, SLOT(getSearch(QString, bool)));
     connect(ui->actionExport_JSON_Path, SIGNAL(triggered()), this, SLOT(showExport()));
     connect(expDg, SIGNAL(pathChanged(QString)), this, SLOT(resetJsonPath(QString)));
@@ -80,11 +83,13 @@ void base::addConnections(){
  */
 bool base::extract(QString input, bool append){
      if(parse.selectCfg(cfgChoice)){
+        setStatusBar(input, true, false);
         if(parse.query(runCount, input)){
             parse.setAppend(append);
            if(parse.readFile()){
                 if(parse.writeFile()){
                     display->setView(parse.jData,parse.verbData);
+                    setStatusBar("", true, true);
                     opt->setResults(parse.getQTotal(), parse.counter);
                     runCount++;
                     return true;
@@ -93,6 +98,18 @@ bool base::extract(QString input, bool append){
          }
      }
      return false;
+}
+/*
+ * Fill the status bar
+ */
+void base::setStatusBar(QString name, bool query, bool finished){
+    if(!query && !finished){
+        ui->statusbar->showMessage("Downloading: "+name);
+    }else if(query && !finished){
+        ui->statusbar->showMessage("Querying");
+    }else{
+        ui->statusbar->showMessage("OpenGov");
+    }
 }
 
 /*

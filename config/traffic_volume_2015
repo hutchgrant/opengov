@@ -1,0 +1,25 @@
+// 45,000 traffic volume entries, used for obtaining traffic data from 1988-2010. Will consume a lot of memory.
+name "Traffic volume characteristics on Provincial Highways(2015)"
+url https://www.ontario.ca/sites/default/files/opendata/1371_traffic_volumes.csv
+list traffic
+col 1 test1
+col 1 $IGNORE SRLR
+col 2 test2
+col 3 test3
+col 4 test4
+col 5 test5
+col 6 test6
+col 7 test7
+col 8 test8
+col 9 test9
+col 10 test10
+col 11 test11
+col 12 test12
+col 13 test13
+col 14 test14
+col 15 test15
+col 16 test16
+col 17 test17
+col 18 test18
+col 19 test19
+col 20 test20
