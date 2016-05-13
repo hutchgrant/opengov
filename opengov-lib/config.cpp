@@ -56,38 +56,7 @@ bool config::readCfgList(){
 }
 
 /*
- *  count config file
- */
-bool config::readCfgUrl(int pos, cfgObj *obj){
-    int rowCount = 0;
-    QFile file("./config/"+cfgList[pos]);
-    if(file.open(QIODevice::ReadOnly))
-    {
-       QTextStream in(&file);
-       while(!in.atEnd()){
-           QString line = in.readLine();
-           QString firstCol = line.section(' ', 0, 0);
-           QString secCol = line.section(' ', 1, 1);
-
-           if(secCol.indexOf("\"")==0){
-               secCol = line.section(("\""), 1,1);
-           }
-           if(firstCol == "name"){
-               obj->setName(secCol);
-           }else if(firstCol == "url"){
-               obj->setURL(secCol);
-           }
-           rowCount++;
-       }
-       file.close();
-       return true;
-    }
-    return false;
-
-}
-
-/*
- *  Parse config file
+ *  read config file
  */
 bool config::readCfg(int pos,cfgObj *obj){
     cfgRowCount = 0;

@@ -65,6 +65,7 @@ private slots:
          extract(input, amend);
     }
     void showExport(){
+        expDg->showBrowse();
         expDg->show();
     }
     void resetJsonPath(QString path){
@@ -87,8 +88,12 @@ private slots:
     }
 
     void error(int errorCode){
+        expDg->showError(errorCode);
+        expDg->show();
     }
-    void on_actionView_in_HTML_triggered();
+    void on_actionView_in_HTML_triggered(){
+        openWebView();
+    }
 };
 
 #endif // BASE_H

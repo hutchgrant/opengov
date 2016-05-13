@@ -56,7 +56,6 @@ public:
     bool selectCfg(int choice);
     bool download();
     bool query(int count, QString qSearch);
-    bool readColumns();
     bool readFile();
     bool writeFile();
     void parse(QString line);
@@ -102,7 +101,6 @@ public slots:
     }
 signals:
     void error(int);
-    void listFound(QString *, int);
 private:
     fileObj entry;
     config cfg;

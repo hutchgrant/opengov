@@ -118,9 +118,7 @@ public slots:
         return "";
     }
     string *getLine(int line){
-        if(line <= objSize){
-            return columns[line];
-        }
+        return columns[line];
     }
     void setTotal(long calc){
         total = calc;

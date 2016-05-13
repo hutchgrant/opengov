@@ -164,7 +164,7 @@ void parseCSV::parse(QString line){
     for(int i=0; i<cObj.colSize; i++){
         cols[i] = "";
     }
-    for(int i=0; i<approxSize; i++){
+    for(int i=0; i<=approxSize; i++){
         skipFlag = false;
         skipColumn = 0;
         column = line.section(",",i,i);

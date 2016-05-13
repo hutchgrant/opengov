@@ -37,7 +37,6 @@ public:
     config();
     void initCfgList();
     bool readCfgList();
-    bool readCfgUrl(int pos, cfgObj *obj);
     bool readCfg(int pos, cfgObj *obj);
     void parseCfg(QString line, cfgObj *obj);
     virtual ~config();

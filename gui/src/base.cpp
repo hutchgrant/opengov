@@ -117,9 +117,3 @@ base::~base()
     delete expDg;
     delete detach;
 }
-
-
-void base::on_actionView_in_HTML_triggered()
-{
-    openWebView();
-}
